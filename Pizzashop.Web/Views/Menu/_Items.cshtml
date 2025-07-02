@@ -1,0 +1,249 @@
+@model Pizzashop.Entity.ViewModel.PagedResult<Pizzashop.Entity.ViewModel.ItemListVM>;
+
+@{
+    string message = "Are you sure you want to delete Item?";
+    string allDelete = "Are you sure you want to delete all selected Items?";
+}
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+<div id="single-delete-modal">
+    <partial name="_DeleteConfirmationModal" model="message" />
+</div>
+<div id="multiple-delete-modal">
+    <partial name="_DeleteConfirmationModal" model="allDelete" />
+</div>
+
+<div class="table-responsive table-scroll">
+    <table class="table table-hover">
+        <thead class=" text-center border-dark ">
+            <tr>
+                <th scope="col">
+                    <div class="form-check text-start">
+                        <input class="permission-checkbox  all-check me-2" type="checkbox" value=""
+                            id="flexCheckIndeterminate">
+                        <label class="form-check-label " for="flexCheckIndeterminate">
+                            Name
+                        </label>
+                    </div>
+                </th>
+                <th scope="col">Item Type</th>
+                <th scope="col">Rate</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Available</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+
+        <tbody class="text-center">
+            @if (Model.PagedList.Count() != 0)
+            {
+                @foreach (var item in Model.PagedList)
+                {
+                    <tr class="align-content-center">
+                        <td class="text-start ">
+                            <div class="form-check d-flex align-items-center ">
+                                <input class="item-check  me-2 @item.Id" type="checkbox" data-id="@item.Id">
+                                <div class="form-check-label" for="flexCheckDefault">
+                                    <img src='@((string.IsNullOrEmpty(item.Image)) ? "../images/dining-menu.png" : Url.Content("~/Uploads/" + item.Image))'
+                                        class="rounded-circle me-2" width="40px" height="40px">
+                                    @if (item.Name.Length > 15)
+                                    {
+                                        <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                            data-bs-custom-class="custom-tooltip" data-bs-title="@item.Name">
+                                            @(item.Name.Substring(0, 15) + " ...")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.Name</span>
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <img src="~/images/icons/@(item.Type == "Veg" ? "veg-icon.svg" : (item.Type == "Non-Veg") ? "non-veg-icon.svg" : "vegan-icon.svg")"
+                                alt="" width="20px">
+                        </td>
+                        <td>
+                            @item.Rate
+                        </td>
+                        <td>
+                            @item.Quantity
+                        </td>
+                        <td>
+
+                            <div class="form-check form-switch d-flex justify-content-center">
+                                <input class="form-check-input fs-5" role="button" asp-for="@item.IsAvailable" id="@item.Id"
+                                    onclick="return false">
+                            </div>
+
+                        </td>
+                        <td>
+                            <a title="Edit" role="button" type="button" class="btn edit-item-btn" data-id="@item.Id">
+                                <img src="~/images/icons/edit-pen.svg" alt="" width="20px">
+                            </a>
+                            <button title="Delete" type="button" class="btn delete-item-btn" data-bs-toggle="modal"
+                                disabled="@(canDelete == false)" data-bs-target="#deleteModal" data-id="@item.Id">
+                                <img src="~/images/icons/trash.svg" alt="" width="20px">
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6"> No Items Found!</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div id="item-pagination">
+    <partial name="_Pagination" model="@Model.Pagination" />
+</div>
+
+<script>
+    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+</script>
+
+<script>
+    var page = @Model.Pagination.CurrentPage;
+
+    $.each(itemsToDelete, function (i, val) {
+        $(`.item-check.${val}`).prop("checked", true);
+        var isAllChecked = $('.item-check:checked').length == $('.item-check').length;
+        $(".all-check").prop("checked", isAllChecked)
+    })
+
+    $(".edit-item-btn").off("click").click(function () {
+        var id = $(this).data("id");
+        var body = $("#addNewModal");
+
+        $.ajax({
+            method: "GET",
+            url: "/Menu/GetItemById",
+            data: { id: id },
+            success: function (data) {
+                body.html(data);
+                body.modal("show");
+            },
+            error: function () {
+                body.modal("hide")
+            }
+        });
+    });
+
+    var deleteModal = $("#single-delete-modal #delete-modal");
+    $(".delete-item-btn").off("click").click(function () {
+        var id = $(this).data("id");
+
+        deleteModal.modal("show");
+        deleteModal.find("#delete-btn").attr('data-id', id);
+    });
+
+    $("#single-delete-modal #delete-btn").off("click").click(function () {
+        var id = $(this).data("id");
+
+        $.ajax({
+            type: "POST",
+            url: "/Menu/DeleteItem",
+            data: { id },
+            success: function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    $(".item.active").trigger("click");
+                    deleteModal.modal("hide")
+                }
+                else {
+                    toastr.error(response.message);
+                }
+            }
+        });
+    })
+    $(".item-check").off("change").change(function () {
+        var checked = $(this).is(":checked");
+        var id = $(this).data("id");
+        if (checked) {
+            itemsToDelete.push(id);
+        }
+        else {
+            removeItem(itemsToDelete, id);
+        }
+
+        var isAllChecked = $('.item-check:checked').length == $('.item-check').length;
+        $(".all-check").prop("checked", isAllChecked)
+    })
+
+    $(".all-check").off("change").change(function () {
+        var checked = $(this).is(":checked");
+        $(".item-check").prop("checked", checked);
+        @* itemsToDelete = [] *@
+            $(".item-check").change();
+    })
+
+    @* Delete Multiple Items  *@
+    var multipleDeleteModal = $("#multiple-delete-modal");
+
+    $("#delete-multiple-items").off("click").click(function () {
+        if (itemsToDelete.length == 0) {
+            toastr.error("No Items Selected!");
+            return;
+        }
+        multipleDeleteModal.find("#delete-modal").modal("show");
+    });
+
+    multipleDeleteModal.find("#delete-btn").off("click").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/Menu/DeleteManyItem",
+            data: { ids: itemsToDelete },
+            success: function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    $(".item.active").click();
+                }
+                else {
+                    toastr.error(response.message);
+                }
+            }
+        })
+    })
+
+    // Remove Item From Array 
+    function removeItem(array, idToDelete) {
+        const index = array.indexOf(idToDelete);
+
+        if (index !== -1) {
+            array.splice(index, 1);
+        }
+    }
+
+    var searchchange = debounce(function () {
+        page = 1;
+        loadPagedItems()
+    }, 200);
+
+    $("#search").off("keyup").on("keyup", searchchange);
+
+    $("#item-pagination #next-page-btn").off("click").on("click", function () {
+        page = @Model.Pagination.CurrentPage + 1;
+        loadPagedItems();
+    });
+
+    $("#item-pagination #prev-page-btn").off("click").on("click", function () {
+        page = @Model.Pagination.CurrentPage - 1;
+        loadPagedItems();
+    });
+    $("#item-pagination #pagesizelist").off("change").change(function () {
+        page = 1;
+        loadPagedItems();
+    })
+
+</script>

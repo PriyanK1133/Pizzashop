@@ -1,0 +1,85 @@
+@model Pizzashop.Entity.ViewModel.PagedResult<Pizzashop.Entity.ViewModel.UserListVM>;
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+<!-- Table  -->
+<div class="bg-white shadow-lg ">
+    <div class="table-responsive table-scroll">
+        <table class="table table-hover  p-3">
+            <thead class="border-dark ">
+                <tr class="d-flex">
+                    <th class="col-3" scope="col">Name
+                        <span class="sort" role="button" data-sortcolumn="name"><img src="~/images/icons/sort.svg"
+                                alt="" width="20px"></span>
+                    </th>
+                    <th class="col-3" scope="col">Email</th>
+                    <th class="col" scope="col">Phone</th>
+                    <th class="col" scope="col">Role
+                        <span class="sort" role="button" data-sortcolumn="role"><img src="~/images/icons/sort.svg"
+                                alt="" width="20px"></span>
+                    </th>
+                    </th>
+                    <th class="col" scope="col">Status</th>
+                    <th class="col" scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.PagedList.Any())
+                {
+                    foreach (var user in Model.PagedList)
+                    {
+                        <tr class="d-flex">
+                            <td class="text-nowrap col-3 overflow-hidden"><img
+                                    src='@((string.IsNullOrEmpty(user.ProfileImage)) ? "../images/Default_pfp.svg.png" : Url.Content("~/Uploads/" + user.ProfileImage))'
+                                    class="rounded-circle" width="40px" height="40px"><span class="ms-2">@user.FirstName
+                                    @user.LastName</span>
+                            </td>
+                            <td class="col-3 overflow-hidden">@user.Email</td>
+                            <td class="col">@user.Phone</td>
+                            <td class="col">@user.Role</td>
+                            <td class="col"><span
+                                    class=" @((user.IsActive.GetValueOrDefault()) ? "active" : "inactive") ">@((user.IsActive.GetValueOrDefault())
+                                                                ? "Active" : "Inactive")</span>
+                    </td>
+                    <td class="col text-nowrap">
+                        @if (RolePriority.GetRolePriority(User.Claims.FirstOrDefault(u => u.Type ==
+                                                ClaimTypes.Role)?.Value) > RolePriority.GetRolePriority(user.Role))
+                                {
+                                    <a role="button" title="Update" type="button" class="btn btn-sm " asp-action="Edit" asp-controller="Users"
+                                        asp-route-id="@user.Id">
+                                        <img src="~/images/icons/edit-pen.svg" alt="" width="20px">
+                                    </a>
+                                    @if (canDelete)
+                                    {
+                                        <button title="Delete" data-id="@user.Id" type="button" class="btn btn-sm deleteItem" data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal">
+                                            <img src="~/images/icons/trash.svg" alt="" width="20px">
+                                        </button>
+                                    }
+
+                                }
+                                else
+                                {
+                                    <spna class="fw-bold">View Only</spna>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="text-center" colspan="6">No Users Found!</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+    <div id="users-pagination">
+        <partial name="_Pagination" model="Model.Pagination" />
+    </div>
+</div>

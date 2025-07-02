@@ -1,0 +1,264 @@
+@model Pizzashop.Entity.ViewModel.ModifierVM;
+
+@{
+    bool IsAdd = Model?.Id.Equals(Guid.Empty) ?? true;
+}
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+
+<div class="modal-dialog modal-dialog-centered modal-xl">
+    <form method="post" id="add-modifier-form" class="w-100">
+        <input type="hidden" asp-for="Id">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title text-secondary fs-5" id="exampleModalLabel">
+                    @if (IsAdd)
+                    {
+                        <span>Add Modifier</span>
+                    }
+                    else
+                    {
+                        <span>Update Modifier</span>
+                    }
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md mb-3 ">
+                        <div class="form-floating mb-sm-2">
+                            <div class="dropdown w-100 ">
+
+                                <button class="btn form-control dropdown-toggle w-100 text-start border-dark py-3"
+                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select Modifier Group(s)
+                                </button>
+                                <ul id="dd-modifier-groups" class="dropdown-menu w-100" aria-labelledby="multiSelect">
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md mb-3">
+                        <div class="form-floating">
+                            <input asp-for="Name" name="Name" placeholder="Name*" class="form-control ">
+                            <label asp-for="Name">Name*</label>
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md mb-3 ">
+                        <div class="form-floating">
+                            <input type="number" asp-for="Rate" name="Rate" placeholder="Rate*" class="form-control ">
+                            <label asp-for="Rate">Rate*</label>
+                        </div>
+                        <span asp-validation-for="Rate" class="text-danger"></span>
+                    </div>
+                    <div class="col-md mb-3 ">
+                        <div class="form-floating">
+                            <input asp-for="Quantity" name="Quantity" placeholder="Quantity*" class="form-control  ">
+                            <label asp-for="Quantity">Quantity*</label>
+                        </div>
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+                    <div class="col-md mb-3">
+                        <div class="form-floating ">
+                            <select role="button" name="UnitId" class="form-select" asp-for="UnitId"
+                                id="dd-modifier-unit">
+                                <option selected disabled>Select Unit</option>
+                            </select>
+                            <label asp-for="UnitId"></label>
+                        </div>
+                        <span asp-validation-for="UnitId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col ">
+                    <div class="form-floating">
+                        <textarea asp-for="Description" name="Description" placeholder="Description"
+                            class="form-control "></textarea>
+                            <label asp-for="Description">Description*</label>
+                    </div>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="modal-footer ">
+                <button type="submit" class="btn btn-primary bg-header rounded-0" disabled="@(!canEdit)">Save </button>
+                <button type="button" class="btn rounded-0 border-dark me-3" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: "/Menu/BindData",
+            success: function (response) {
+                var ddModifierGroups = $("#dd-modifier-groups");
+                var ddUnit = $("#dd-modifier-unit");
+
+                ddModifierGroups.empty().append('<option class="ms-3" disabled selected>Select Modifier Group(s)</option>');
+                $.each(response.modifier_groups, function () {
+                    ddModifierGroups.append(`<li >
+                                <div class="form-check ms-3">
+                                    <input class="form-check-input modifier-group-checkbox " type="checkbox" value="${this.value}" id="${this.value}-checkbox">
+                                    <label class="form-check-label" for="${this.value}">
+                                        ${this.text}
+                                    </label>
+                                </div>
+                            </li>`);
+                });
+
+                ddUnit.empty().append('<option selected disabled>Select Unit</option>');
+                $.each(response.units, function () {
+                    ddUnit.append($("<option></option>").attr("selected", "@Model?.UnitId" == this['value']).val(this['value']).html(this['text']));
+                });
+            }
+        }).done(function () {
+            if (!@IsAdd.ToString().ToLower()) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Menu/GetModifierGroupsForModifier",
+                    data: { id: "@Model?.Id" },
+                    success: function (response) {
+                        if (response.success) {
+                            data = response.data;
+                            $.each(data, function (i, val) {
+                                $(`#${val.id}-checkbox`).prop("checked", true);
+                            })
+                        }
+                        else {
+                            toastr.error("Something went wrong!");
+                            return;
+                        }
+                    }
+                });
+            }
+        });
+        var modifierValidator = $("#add-modifier-form").validate({
+            rules: {
+                Name: {
+                    required: true,
+                },
+                Rate: {
+                    required: true,
+                    number: true,
+                    min: 0
+                },
+                Quantity: {
+                    required: true,
+                    min: 0
+                },
+                UnitId: {
+                    required: true,
+                },
+            },
+            messages: {
+                Name: {
+                    required: "Please enter category name",
+                },
+                Rate: {
+                    required: "Rate is required!",
+                    number: "must be a number",
+                    min: "Negative values not allowed!"
+                },
+                Quantity: {
+                    required: "Quantity is required!",
+                    min: "Negative values not allowed!"
+                },
+                UnitId: {
+                    required: "Select One!"
+                },
+            },
+            errorPlacement: function (error, element) {
+                if (element[0].type == 'select-one') {
+                    error.insertAfter(element.parent());
+                }
+                else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function (element) {
+                if (element.type == 'select-one') {
+                    $(element).parent().parent().addClass("error");
+                }
+                else {
+                    $(element).parent().addClass("error");
+                }
+            },
+            unhighlight: function (element) {
+                if (element.type == 'select-one') {
+                    $(element).parent().parent().removeClass("error");
+                }
+                else {
+                    $(element).parent().removeClass("error");
+                }
+            },
+        });
+
+        $('#add-modifier-form').off("keyup").one('keyup', function () { $(this).valid(); });
+
+        // Add/Edit Modifier 
+        $("#add-modifier-form").off("submit").submit(function (e) {
+            e.preventDefault();
+            if (!$(this).valid()) {
+                return;
+            }
+            var selectedModifierGroups = [];
+            $(".modifier-group-checkbox").each(function (i, e) {
+                if (e.checked) {
+                    selectedModifierGroups.push(e.value);
+                }
+            });
+
+            var modal = $("#add-modifier-modal");
+            var formData = $(this).serializeArray();
+            var modelData = {};
+
+            $.each(formData, function (i, field) {
+                modelData[field.name] = field.value;
+            });
+
+            var data = {
+                model: modelData,
+                modifierGroups: selectedModifierGroups
+            };
+
+            var action = null;
+
+            if (@IsAdd.ToString().ToLower()) {
+                action = "AddModifier";
+            }
+            else {
+                action = "EditModifier";
+            } $.ajax({
+                type: "POST",
+                url: "/Menu/" + action,
+                dataType: "JSON",
+                data: data,
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $(".modifier.active").trigger("click");
+                        modal.modal("hide")
+                    }
+                    else {
+                        toastr.error(response.message)
+                    }
+                },
+                error: function (response) {
+                    toastr.error("Something went wrong!");
+                    modal.modal("hide")
+                }
+            });
+        });
+    });</script>

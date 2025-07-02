@@ -1,0 +1,62 @@
+@model Pizzashop.Entity.ViewModel.PagedResult<Pizzashop.Entity.ViewModel.CustomerVM>;
+
+<div class="bg-white rounded-1">
+    <div class="table-responsive table-scroll">
+        <table class="table table-hover shadow-sm">
+            <thead class="border-dark ">
+                <tr class="d-md-flex">
+                    <th class="col-md-3 text-nowrap" scope="col">Name <span class="sort" role="button"
+                            data-sortcolumn="name"><img src="~/images/icons/sort.svg" alt="" width="20px"></span></th>
+                    <th class="col-md-3" scope="col">Email</th>
+                    <th class="col-md" scope="col">Phone Number</th>
+                    <th class="col-md text-nowrap" scope="col">Date <span class="sort" role="button"
+                            data-sortcolumn="date"><img src="~/images/icons/sort.svg" alt="" width="20px"></span></th>
+                    <th class="col-md text-nowrap" scope="col">Total Order <span class="sort" role="button"
+                            data-sortcolumn="totalorder"><img src="~/images/icons/sort.svg" alt="" width="20px"></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.PagedList.Any())
+                {
+
+                    @foreach (var item in Model.PagedList)
+                    {
+                        <tr class="d-md-flex" onclick="getCustomerHistory(`@item.Id`)">
+                            <td class="col-md-3">@item.Name</td>
+                            <td class="col-md-3">@item.Email</td>
+                            <td class="col-md">@item.Phone</td>
+                            <td class="col-md">@item.Date</td>
+                            <td class="col-md">@item.TotalOrder</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="text-center" colspan="8">No Customers Found!</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div id="customers-pagination">
+        <partial name="_Pagination" model="Model.Pagination" />
+    </div>
+</div>
+
+<div class="modal " id="customer-history" tabindex="-1" aria-labelledby="customerDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-white">
+            <div class="modal-header">
+                <h1 class="modal-title text-secondary fs-5" id="customerDetailLabel">
+                    Customer History
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="customer-orderDetail" style="background-color:  #f2f2f2;;">
+
+            </div>
+        </div>
+    </div>
+</div>

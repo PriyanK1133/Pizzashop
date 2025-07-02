@@ -1,0 +1,280 @@
+@model Pizzashop.Entity.ViewModel.UserVM;
+
+@{
+    string? currentController = Convert.ToString(ViewContext.RouteData.Values["controller"]);
+    string? role = SessionUtils.GetUser(Context)?.Role;
+
+    if (currentController?.Equals("OrderApp") ?? false)
+    {
+        Layout = "_OrderApp";
+    }
+
+    ViewData["Title"] = "My Profile";
+    bool hasImage = !string.IsNullOrEmpty(Model.ProfileImage);
+}
+
+<h1 class="text-header mb-2">My Profile</h1>
+<div class="">
+    <img src="~/images/profile_div_bg.jpg" class="object-fit-cover" width="100%" height="100px">
+</div>
+
+<div class="bg-light px-3 shadow-lg">
+    <div class="d-flex flex-sm-row flex-column gap-1 py-3 temp">
+        <form id="profile-img-form" asp-action="UploadProfileImage" asp-controller="Home" method="post"
+            enctype="multipart/form-data">
+            <input type="hidden" asp-for="ProfileImage">
+            <div class="profile-img">
+                <div id="previewProfileImage">
+
+                    <button class="btn btn-close position-absolute end-0 top-0 @(hasImage?"":"d-none")"
+                        type="button"></button>
+                    <img src='@(!hasImage ? "../images/Default_pfp.svg.png" : Url.Content("~/Uploads/"+Model.ProfileImage))'
+                        class="rounded-circle" height="150px" width="150px">
+                </div>
+                <div class="camera-icon" type="button">
+                    <input type="file" class="d-none" name="imageFile" id="profileImageFile"
+                        value="@Url.Content("~/Uploads/"+@Model.ProfileImage)" accept=".jpg, .jpeg, .png">
+                    <label for="profileImageFile">
+                        <img src="~/images/icons/camera-icon.svg" alt="">
+                    </label>
+                </div>
+            </div>
+        </form>
+        <div class="ms-2">
+            <h2 class="">@Model.FirstName @Model.LastName</h2>
+            <p>@Model.Role</p>
+        </div>
+        <div class="ms-sm-auto me-2 text-secondary mb-sm-3">
+            <p>@Model.Email</p>
+        </div>
+    </div>
+
+    <form asp-action="Profile" asp-controller="Home" method="post">
+        <input type="hidden" asp-for="ProfileImage">
+        <div class="row gap-2">
+            <div class="col-md">
+                <div class="form-floating mb-sm-3">
+                    <input asp-for="FirstName" class="form-control" placeholder="First Name">
+                    <label asp-for="FirstName">First Name*</label>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating mb-sm-3">
+                    <input asp-for="LastName" class="form-control" placeholder="Last Name">
+                    <label asp-for="LastName">Last Name*</label>
+                    <span asp-validation-for="LastName" class="text-danger "></span>
+                </div>
+            </div>
+        </div>
+        <div class="row gap-2">
+            <div class="col-md">
+                <div class="form-floating mb-sm-3">
+                    <input asp-for="UserName" class="form-control" placeholder="UserName">
+                    <label asp-for="UserName">User Name*</label>
+                    <span asp-validation-for="UserName" class="text-danger "></span>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating mb-sm-3">
+                    <input class="form-control" asp-for="Phone" placeholder="Phone">
+                    <label asp-for="Phone">Phone*</label>
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row gap-2">
+            <div class="col-md">
+                <div class="form-floating mb-sm-3">
+                    <select asp-for="CountryId" role="button" id="country" class="form-select" id="floatingSelect">
+                        <option disabled>Please select one</option>
+                    </select>
+                    <label asp-for="CountryId">Country*</label>
+                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating mb-sm-3">
+                    <select asp-for="StateId" id="state" role="button" class="form-select">
+                        <option disabled>Please select one</option>
+                    </select>
+                    <label asp-for="StateId">State*</label>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating mb-sm-3">
+                    <select asp-for="CityId" id="city" role="button" class="form-select" required>
+                        <option disabled>Please select one</option>
+                    </select>
+                    <label asp-for="CityId">City*</label>
+                    <span asp-validation-for="CityId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row gap-2">
+            <div class="col-md-8">
+                <div class="form-floating mb-sm-3">
+                    <textarea class="form-control" asp-for="Address" placeholder="Address"></textarea>
+                    <label asp-for="Address"></label>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating mb-sm-3">
+                    <input class="form-control" asp-for="Zipcode" placeholder="Zipcode">
+                    <label asp-for="Zipcode"></label>
+                </div>
+            </div>
+        </div>
+        <div class="row p-2">
+            <div class="col-auto ms-auto">
+                <button type="submit"
+                    class="btn rounded-0 btn-primary bg-header text-white col-auto mb-sm-3 me-3">Update</button>
+                <a asp-action="@(role == Constants.Chef? "KOT":"Index")"
+                    asp-controller="@(role == Constants.Chef? "OrderApp":"Dashboard")"
+                    class="btn rounded-0 border-primary text-primary col-auto mb-sm-3">Cancel</a>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function bindLocationData() {
+            let country = $("#country");
+
+            $.get("@Url.Action("CountryBind", "Home")", null, function (data) {
+                let v = "<option disabled selected>Please select one</option>";
+                $.each(data, function (i, v1) {
+                    v += "<option value=" + v1.value + ">" + v1.text + "</option>";
+                });
+                country.html(v);
+                country.val("@Model.CountryId")
+            });
+
+            var state = $("#state");
+            $.get("@Url.Action("StateBind", "Home")", { countryId: "@Model.CountryId" }, function (data) {
+                let v = "<option disabled selected>Please select one</option>";
+                $.each(data, function (i, v1) {
+                    v += "<option value=" + v1.value + ">" + v1.text + "</option>";
+                });
+                state.html(v);
+                state.val("@Model.StateId")
+            });
+
+            var city = $("#city");
+            $.get("@Url.Action("CityBind", "Home")", { stateId: "@Model.StateId" }, function (data) {
+                var v = "<option disabled selected>Please select one</option>";
+                $.each(data, function (i, v1) {
+                    v += "<option value=" + v1.value + ">" + v1.text + "</option>";
+                });
+                city.html(v);
+                city.val("@Model.CityId");
+            });
+        }
+
+        $(document).ready(function () {
+
+            bindLocationData();
+            $("#country").change(function () {
+                var id = $(this).val();
+
+                var state = $("#state");
+                var city = $("#city");
+                var v = "<option disabled selected>Please select one</option>";
+
+                state.empty();
+                city.empty();
+                city.html(v);
+                city.attr("disabled", "disabled");
+
+                $.get("@Url.Action("StateBind", "Home")", { countryId: id }, function (data) {
+
+                    $.each(data, function (i, v1) {
+                        v += "<option value=" + v1.value + ">" + v1.text + "</option>";
+                    });
+                    state.html(v);
+                });
+            });
+
+            $("#state").change(function () {
+                var id = $(this).val();
+                var city = $("#city");
+
+                city.removeAttr("disabled", "disabled");
+                city.empty();
+
+                $.get("@Url.Action("CityBind", "Home")", { stateId: id }, function (data) {
+                    var v = "<option disabled selected>Please select one</option>";
+                    $.each(data, function (i, v1) {
+                        v += "<option value=" + v1.value + ">" + v1.text + "</option>";
+                    });
+                    city.html(v);
+                });
+            });            
+            
+            // Image Uploading 
+            $("#profileImageFile").change(function (e) {
+                var previewProfileImage = $("#previewProfileImage");
+                var file = e.target.files[0];
+                var regex = /.+(.jpg|.jpeg|.png)$/;
+
+                if (regex.test($(this).val().toLowerCase())) {
+                    if (typeof (FileReader) != "undefined") {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            var img = previewProfileImage.find("img");
+                            var btn = previewProfileImage.find("button");
+
+                            img.attr("src", e.target.result);
+                            btn.removeClass("d-none");
+                            previewProfileImage.find("span").remove();
+
+                        }
+                        reader.readAsDataURL(file);
+                        $("#profile-img-form").submit();
+                    } else {
+                        toastr.error("This browser does not support FileReader.");
+                    }
+                } else {
+                    toastr.error("Please upload a valid image file.");
+                    $(this).val('');
+                }
+            });
+
+            $("#previewProfileImage button").click(function () {
+                $("#profileImageFile").val('');
+                var img = $(this).parent().find("img")
+                img.attr("src", "@Url.Content("~/images/Default_pfp.svg.png")");
+                $(this).addClass("d-none");
+                $("#profile-img-form").submit();
+            });
+
+            // Drag And Drop Image
+
+            $("#previewProfileImage").on("dragover", function (e) {
+                e.preventDefault();
+                $(this).addClass("border-primary");
+            });
+            $("#previewProfileImage").on("dragleave", function (e) {
+                e.preventDefault();
+                $(this).removeClass("border-primary");
+            });
+
+            $("#previewProfileImage").on('drop', function (e) {
+                e.preventDefault();
+                $(this).removeClass("border-primary"); var files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    $('#profileImageFile').prop('files', files);
+                    $('#profileImageFile').trigger('change');
+                }
+            });
+        });
+    </script>
+}

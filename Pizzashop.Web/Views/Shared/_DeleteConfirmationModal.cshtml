@@ -1,0 +1,26 @@
+@model string;
+
+@* Delete Confirmation Modal  *@
+<div class="modal fade " id="delete-modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title text-secondary fs-5" id="exampleModalLabel">
+                    Delete Confirmation
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="~/images/toppng.com-warning-icon-2400x2400.png" width="35px" alt="" class="mb-2">
+                <p>@Model</p>
+            </div>
+            <div class="text-center mb-3">
+                <a id="delete-btn" type="button" class="btn btn-primary bg-header me-2 rounded-0 px-3" 
+                    data-bs-dismiss="modal">Yes</a>
+                <button type="button" class="btn text-primary bg-white text-header border-primary rounded-0 px-3"
+                    data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>

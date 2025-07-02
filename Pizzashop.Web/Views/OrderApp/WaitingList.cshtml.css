@@ -1,0 +1,16 @@
+.nav-link {
+  color: var(--bs-secondary);
+  font-weight: 600;
+}
+.nav-pills .nav-link.active {
+  background-color: transparent;
+  color: var(--primary-color);
+  font-weight: bold;
+  border-bottom: 2px solid var(--primary-color);
+  border-radius: 0;
+}
+
+.active-btn {
+  background-color: var(--primary-color);
+  color: white;
+}

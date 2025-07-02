@@ -1,0 +1,6 @@
+.item-details{
+    height: 40vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Pizzashop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/orderapp.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Pizzashop.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+</head>
+
+<body class="min-vh-100">
+    @{
+        UserVM? user = SessionUtils.GetUser(Context);
+
+        string? userName = user?.UserName;
+        string? profileImage = user?.ProfileImage;
+        string? role = user?.Role; Dictionary<string, string> options = new()
+        {
+        {"KOT","bi bi-bag-dash-fill"},
+        {"Waiting List","bi bi-clock-fill"},
+        {"Tables","bi bi-microsoft"},
+        {"Menu","fa-solid fa-bell-concierge"},
+        };
+    }
+
+    @functions {
+        public string RemoveWhitespace(string input)
+        {
+            return new string(input.Where(c => !char.IsWhiteSpace(c)).ToArray());
+        }
+    }
+
+    @{
+        Func<string, string> IsSelected = (action) =>
+        {
+            action = @RemoveWhitespace(action);
+            if (ViewContext.RouteData.Values["action"]?.ToString() == action)
+            {
+                return "active";
+            }
+            return string.Empty;
+        };
+    }
+
+    @* Logout modal  *@
+    <div class="modal fade " id="logoutModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" width="35px" alt="" class="mb-2">
+                    <p>Are you sure you want to Logout?</p>
+                </div>
+                <div class="text-center mb-3">
+                    <a id="logout-btn" type="button" class="btn btn-primary bg-header me-2 rounded-0 px-3"
+                        asp-action="Logout" asp-controller="Account">Yes</a>
+                    <button type="button" class="btn text-primary bg-white text-header border-primary rounded-0 px-3"
+                        data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="h-100">
+
+        <!-- Navbar -->
+        <nav class="navbar bg-header nav position-sticky top-0 z-3">
+            <div class="d-flex">
+
+                @if (IsSelected("Menu") == "active")
+                {
+                    <div class="align-content-center">
+                        <button class="btn d-lg-none bg-white fw-bold rounded-pill mx-2" type="button"
+                            data-bs-toggle="offcanvas" data-bs-target="#category-offcanvas"
+                            aria-controls="offcanvasExample">
+                            <img src="~/images/icons/menu-bar.svg">
+                        </button>
+                    </div>
+                }
+
+                <a asp-action="@(role == Constants.Chef ? "KOT" : "Index")"
+                    asp-controller="@(role == Constants.Chef ? "OrderApp" : "Dashboard")"
+                    class="btn p-1 d-flex mb-2 mb-md-0 ">
+                    <div class="bg-white mx-2 align-content-center p-0">
+                        <img src="~/images/logos/pizzashop_logo.png" alt="" width="50px">
+                    </div>
+                    <span class="text-white fs-2 ">Pizzashop</span>
+                </a>
+            </div>
+
+            <div class="ms-auto d-flex gap-2 align-items-center">
+                <div class="d-flex gap-2">
+                    @if (Constants.AccountManager.Equals(role))
+                    {
+                        @foreach (var item in options)
+                        {
+                            <a asp-action="@RemoveWhitespace(item.Key)" asp-controller="OrderApp"
+                                class="btn border rounded-pill py-1 px-3 text-white orderapp-options @IsSelected(RemoveWhitespace(item.Key))">
+                                <i class="@item.Value"></i>
+                                <span class="d-none d-md-inline">@item.Key</span>
+                            </a>
+                        }
+                    }
+                    else if (Constants.Chef.Equals(role))
+                    {
+                        <a asp-action="KOT" asp-controller="OrderApp"
+                            class="btn border rounded-pill py-1 px-3 text-white orderapp-options @IsSelected("KOT")">
+                            <i class="bi bi-bag-dash-fill"></i>
+                            <span class="d-none d-md-inline">KOT</span>
+                        </a>
+                    }
+                </div>
+                <div class="dropdown me-3 ">
+                    <div class="profile " type="button" data-bs-toggle="dropdown">
+                        <img src="@(string.IsNullOrEmpty(profileImage) ? Url.Content("/images/Default_pfp.svg.png") : Url.Content("/Uploads/" + profileImage))"
+                            class="bg-light user-img rounded-circle " width="40px" height="40px">
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end p-2">
+                        <li class=" d-flex align-items-center ">
+                            <img src="@(string.IsNullOrEmpty(profileImage) ? Url.Content("/images/Default_pfp.svg.png") : Url.Content("/Uploads/" + profileImage))"
+                                class="user-img bg-light rounded-circle " width="50px" height="50px">
+                            <span class="dropdown-item-text text-secondary  text-nowrap">
+                                @if (userName?.Length > 10)
+                                {
+                                    <span>@userName.Substring(0, 10)...</span>
+                                }
+                                else
+                                {
+                                    <span>@userName</span>
+                                }
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-secondary" asp-action="Profile"
+                                asp-controller="@(role == Constants.Chef ? "Home" : "OrderApp")">
+                                <i class="fa-solid fa-user li-click ps-1 me-2"></i>
+                                My Profile</a></li>
+                        <li><a class="dropdown-item text-secondary " asp-action="ChangePassword" asp-controller="Home">
+                                <i class="fa-solid fa-rotate-right li-click ps-1 me-2"></i>
+                                Change Password
+                            </a>
+                        </li>
+                        <li><a type="button" class="dropdown-item text-secondary" data-bs-toggle="modal"
+                                data-bs-target="#logoutModal">
+                                <i class="fa-solid fa-right-from-bracket li-click ps-1 me-2"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+
+        <!--  -->
+        <main role="main" class="container-fluid h-100">
+            <partial name="_Notification" />
+            <partial name="_Loader" />
+            @RenderBody()
+        </main>
+
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                preventDuplicates: true,
+                preventOpenDuplicates: true,
+            };
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

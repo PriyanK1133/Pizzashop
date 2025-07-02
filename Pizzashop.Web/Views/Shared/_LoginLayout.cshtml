@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Pizzashop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Pizzashop.Web.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/_LoginLayout.css" />
+</head>
+
+<body>
+    <div class="login-section">
+        <div class="bg-img bg-md-img position-fixed top-0 w-100 h-100  d-md-none z-n1">
+        </div>
+        <div class=" row  align-items-center vh-100">
+
+            <div class="bg-img col-12 col-md-6  d-none d-md-block">
+            </div>
+            <div class="col-12 col-md-6  d-grid">
+                <div class="login-section col-11 col-md-9  p-3 mt-5 rounded-2 d-flex flex-column m-auto gap-3">
+                    <div class="heading d-flex align-items-center justify-content-center gap-3">
+                        <img src="~/images/logos/pizzashop_logo.png" alt="pizzashop_logo" class="img-fluid"
+                            width="100px">
+                        <h1 class="text-header">PIZZASHOP</h1>
+                    </div>
+                    <partial name="_Notification" />
+                    @RenderBody()
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

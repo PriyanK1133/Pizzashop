@@ -1,0 +1,50 @@
+<div class="accordion accordion-flush" id="accordionFlushExample"> 
+    @foreach (var item in Model)
+    {
+        <div class="accordion-item mb-2 shadow-sm">
+            <div class="accordion-header d-flex justify-content-between">
+                <div class="d-flex gap-2 m-2 section-card w-100" data-bs-toggle="collapse" data-bs-target="#@item.Id"
+                    aria-expanded="false" aria-controls="@item.Name" data-id="@item.Id" type="button">
+                    <div class="align-content-center">
+                        <button class="accordion-button collapsed p-1 " type="button" data-bs-toggle="collapse"
+                            data-bs-target="#@item.Id" aria-expanded="false" aria-controls="@item.Name" data-id="@item.Id">
+
+                        </button>
+                    </div>
+                    <div class="fs-4 fw-semibold z-1">
+                        @item.Name
+                    </div>
+                </div>
+                <div class="section-card-end d-flex align-items-center gap-3 fs-6 me-2">
+                    <div class="d-flex gap-sm-3 gap-1">
+                        <span class="d-flex align-items-center gap-2">
+                            <div class="status-indicator bg-secondary bg-opacity-50 rounded-circle"></div>
+                            <span>@item.AvailableTables</span>
+                        </span>
+                        <span class="d-flex align-items-center gap-2">
+                            <div class="status-indicator bg-success bg-opacity-50 rounded-circle"></div>
+                            <span>@item.AssignedTables</span>
+                        </span>
+                        <span class="d-flex align-items-center gap-2">
+                            <div class="status-indicator bg-primary bg-opacity-50  rounded-circle"></div>
+                            <span>@item.OccupiedTables</span>
+                        </span>
+                    </div>
+                    <button class="border-primary btn text-header rounded-0 text-nowrap waiting-token-btn"
+                        data-bs-toggle="modal" data-bs-target="#waiting-token-modal" data-section="@item.Id">
+                        + <span class="d-none d-sm-inline">Waiting Token</span>
+                    </button>
+                </div>
+            </div>
+            <div id="@item.Id" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body ">
+                </div>
+                <div class="modal-footer p-2 ">
+                    <button class="btn btn-primary bg-header assign-tables-btn" disabled data-bs-toggle="offcanvas"
+                        data-bs-target="#assign-table-offcanvas" data-section="@item.Id">Assign</button>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

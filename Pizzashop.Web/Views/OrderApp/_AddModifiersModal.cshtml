@@ -1,0 +1,27 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.ModifierGroupForItemVM>;
+
+
+@if (!Model.Any())
+{
+    <div class="text-center">No Modifier Groups Applicable For This Item!</div>
+}
+@foreach (var modifierGroup in Model)
+{
+    <div class="modifier-group mb-3" data-min="@modifierGroup.MinSelection" data-max="@modifierGroup.MaxSelection"
+        data-name="@modifierGroup.Name">
+        <div><span class="fs-5 fw-semibold me-2">@modifierGroup.Name</span><small>(You can choose Minimum -
+                @modifierGroup.MinSelection & Maximum - @modifierGroup.MaxSelection options)</small></div>
+        <div class="d-flex flex-wrap gap-3">
+            @foreach (var modifier in modifierGroup.Modifiers)
+            {
+
+                <div class="modifier-card bg-success border border-secondary rounded-1" role="button" data-id="@modifier.Id" data-name="@modifier.Name" data-rate="@modifier.Rate">
+                    <div class="modifier-card-body d-flex flex-column p-2">
+                        <span>@modifier.Name</span>
+                        <small>Rs. @modifier.Rate</small>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

@@ -1,0 +1,50 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.ItemListVM>;
+@using Pizzashop.Entity.Constants;
+
+@if (!Model.Any())
+{
+    <div class="text-center w-100 fs-4 mt-4">No Items In This Category!</div>
+}
+
+<div>
+    <div class="d-flex flex-wrap mt-4 gap-3">
+        <div class="menu-items-not-found text-center w-100 d-none">No Items Found!</div>
+        @foreach (var item in Model)
+        {
+
+            string itemType;
+            switch (item.Type)
+            {
+                case Constants.ItemVeg:
+                    itemType = "bg-success veg-item";
+                    break;
+                case Constants.ItemNonVeg:
+                    itemType = "bg-danger non-veg-item";
+                    break;
+                case Constants.ItemVegan:
+                    itemType = "bg-warning vegan-item";
+                    break;
+                default:
+                    itemType = "";
+                    break;
+            }
+
+            <div class="menu-card  @itemType" data-name="@item.Name" data-id="@item.Id" data-class="@itemType"
+                data-rate="@item.Rate" data-item-tax="@item.TaxPercentage" role="button">
+                <div class="card-body ">
+                    <div class="shadow menu-img align-content-center h-100"
+                        style="background-image: url(@(item.Image == null ? "/images/dining-menu.png" : Url.Content("~/Uploads/" + item.Image)));">
+                    </div>
+                    <div class="card-content">
+                        <small>@item.Name</small>
+                        <div class="d-flex justify-content-between w-100">
+                            <small class="text-secondary">Rs. @item.Rate</small>
+                            <small class="text-secondary favourite-icon" data-id="@item.Id"><i
+                                    class="bi @(item.IsFavourite ? "bi-heart-fill" : "bi-heart") text-header"></i></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

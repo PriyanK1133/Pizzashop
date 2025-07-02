@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Users";
+    var pageOptions = new List<int> { 1, 2, 5, 10, 15, 20 };
+}
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+<!-- DELETE Modal -->
+<div class="modal fade " id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title text-secondary fs-5" id="exampleModalLabel">Delete Confirmation</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="~/images/toppng.com-warning-icon-2400x2400.png" width="35px" alt="" class="mb-2">
+                <p>Are you sure you want to delete User?</p>
+            </div>
+            <div class="text-center mb-3">
+                <a id="deleteBtn" type="button" class="btn btn-primary bg-header rounded-0 me-2">Yes</a>
+                <button type="button" class="btn text-primary bg-white rounded-0 text-header border-primary"
+                    data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TITLE  -->
+<div class="title d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h1 class="text-header">Users</h1>
+    <div class="d-flex gap-2 m-2 justify-content-end align-items-center ">
+        <div class="input-group ">
+            <input type="text" name="search " id="search-users" placeholder="Search" class="form-control border-end-0">
+            <span class="input-group-text bg-white border-start-0">
+                <img src="~/images/icons/search.svg" alt="" width="24px">
+            </span>
+        </div>
+        @if (canEdit)
+        {
+            <a id="add-item-btn" type="button" asp-action="Add"
+                class="btn btn-primary py-2 px-3 text-decoration-none rounded-2 bg-header text-white ms-1 text-nowrap">
+                <span> + New User</span>
+            </a>
+        }
+    </div>
+</div>
+
+<div id="users-partial">
+
+</div>
+@section Scripts {
+    <script src="~/js/users.js"></script>
+    <script>
+        $(function () {
+                $(document).on("click", ".deleteItem", function (e) {
+                    var itemId = $(this).data('id');
+                    $('#deleteBtn').attr('href', '/Users/Delete/' + itemId);
+                });
+        })
+    </script>
+}

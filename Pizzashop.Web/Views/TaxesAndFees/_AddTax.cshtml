@@ -1,0 +1,75 @@
+@model Pizzashop.Entity.ViewModel.TaxAndFeeVM;
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title text-secondary fs-5" id="add-edit-tax-title">
+                <span>Add Tax</span>
+            </h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetForm()"></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" asp-for="Id">
+            <div class="row mb-2">
+                <div class="col-md mb-2">
+                    <div class="form-floating">
+                        <input asp-for="Name" class="form-control" placeholder="Name*">
+                        <label asp-for="Name">Name*</label>
+                    </div>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md mb-2">
+                    <div class="  form-floating ">
+                        <select role="button" class="form-select" asp-for="Type" id="tax-type">
+                            <option value="" selected disabled>Select Type</option>
+                            <option value="Percentage">Percentage</option>
+                            <option value="Flat Amount">Flat Amount</option>
+                        </select>
+                        <label asp-for="Type"></label>
+                    </div>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+                <div class="col-md mb-2">
+                    <div class="form-floating">
+                        <input type="number" asp-for="TaxAmount" class="form-control" placeholder="Name*">
+                        <label asp-for="TaxAmount">Tax Value*</label>
+                    </div>
+                    <span asp-validation-for="TaxAmount" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md mb-2 mb-3">
+                    <div class=" form-check form-switch ms-2 mt-2 ">
+                        <input class="form-check-input" role="switch" asp-for="IsEnabled">
+                        <label class="form-check-label" asp-for="IsEnabled"></label>
+                    </div>
+                    <span asp-validation-for="IsEnabled" class="text-danger"></span>
+                </div>
+                <div class="col-md mb-2 mb-3">
+                    <div class=" form-check form-switch ms-2  mt-2">
+                        <input class="form-check-input " role="switch" asp-for="IsDefault">
+                        <label class="form-check-label" asp-for="IsDefault"></label>
+                    </div>
+                    <span asp-validation-for="IsDefault" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer ">
+            <button id="submit-btn" type="submit" class="btn btn-primary bg-header rounded-0"
+                disabled="@(!canEdit)">Save
+            </button>
+            <button type="button" onclick="resetForm()" class="btn rounded-0 border-dark me-3" disabled="@(!canDelete)"
+                data-bs-dismiss="modal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+

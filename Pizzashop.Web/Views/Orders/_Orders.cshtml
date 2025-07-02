@@ -1,0 +1,78 @@
+@model Pizzashop.Entity.ViewModel.PagedResult<Pizzashop.Entity.ViewModel.OrderListVM>;
+
+<style>
+    .orange {
+        color: orange;
+    }
+</style>
+
+<iframe id="download-frame" name="download-frame" style="display: none;"></iframe>
+
+<div class="bg-white rounded-1">
+    <div class="table-responsive table-scroll">
+        <table class="table table-hover shadow-sm">
+            <thead class="border-dark">
+                <th scope="col">Order<span class="sort" role="button" data-sortcolumn=""><img
+                            src="~/images/icons/sort.svg" alt="" width="20px"></span></th>
+                <th scope="col">Date<span class="sort" role="button" data-sortcolumn="date"><img
+                            src="~/images/icons/sort.svg" alt="" width="20px"></span></th>
+                <th scope="col">Customer<span class="sort" role="button" data-sortcolumn="customer"><img
+                            src="~/images/icons/sort.svg" alt="" width="20px"></span></th>
+                <th scope="col">Status</th>
+                <th scope="col">Payment Mode</th>
+                <th scope="col">Rating</th>
+                <th scope="col">Total Amount<span class="sort" role="button" data-sortcolumn="totalamount"><img
+                            src="~/images/icons/sort.svg" alt="" width="20px"></span></th>
+                <th scope="col">Action</th>
+            </thead>
+            <tbody>
+                @if (Model.PagedList.Any())
+                {
+
+                    @foreach (var item in Model.PagedList)
+                    {
+                        <tr>
+                            <td>#@item.Id.ToString().ToUpper().Substring(item.Id.ToString().Length - 5)</td>
+                            <td>@item.OrderDate</td>
+                            <td>@item.CustomerName</td>
+                            <td>@item.Status</td>
+                            <td>@item.PaymentMode</td>
+                            <td class="text-nowrap">
+                                @for (int i = 0; i < 5; i++)
+                                {
+                                    if (i < item.Rating)
+                                    {
+                                        <span class="fa fa-star orange"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="fa-regular fa-star orange"></span>
+                                    }
+                                }
+                            </td>
+                            <td>Rs. @item.OrderTotal</td>
+                            <td class="text-nowrap">
+                                <a type="button" class="btn" asp-action="GenerateInvoice" target="#download-frame"
+                                    asp-route-id="@item.Id">
+                                    <i class="fa-regular fa-file-pdf "></i>
+                                </a>
+                                <a type="button" class="btn" asp-action="OrderDetails" asp-route-id="@item.Id">
+                                    <i class="fa-regular fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="text-center" colspan="8">No Orders Found!</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div id="orders-pagination" class="me-2">
+        <partial name="_Pagination" model="Model.Pagination" />
+    </div>
+</div>

@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<form asp-action="ExportOrders" method="post" class="position-relative " target="_blank" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+    <div class="d-md-flex flex-column flex-md-row justify-content-between align-items-center mb-2 ">
+        <h1 class="text-header mb-3">Orders</h1>
+        <div class="col-md-9">
+            <div class="d-flex flex-column flex-sm-row gap-2 me-2 justify-content-end align-items-sm-center  mt-2">
+                <div class="input-group  ">
+                    <input type="text" name="searchString" id="search-orders" placeholder="Search"
+                        class="form-control border-end-0">
+                    <span class="input-group-text bg-white border-start-0">
+                        <img src="~/images/icons/search.svg" alt="" width="24px">
+                    </span>
+                </div>
+                <select id="order-status" name="status" class="form-select" aria-label="Default select example">
+                    <option selected value="">All Orders</option>
+                    <option value="@Constants.OrderPending">Pending</option>
+                    <option value="@Constants.OrderCompleted">Completed</option>
+                    <option value="@Constants.OrderInProgress">Processing</option>
+                    <option value="@Constants.OrderServed">Served</option>
+                    <option value="@Constants.OrderCancelled">Cancelled</option>
+                </select>
+
+                <select id="order-time" name="pastDays" class="form-select " aria-label="Default select example">
+                    <option selected value="all">All Time</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="month">Current Month</option>
+                </select>
+
+                <button type="submit"
+                    class="btn btn-primary py-1 px-3 text-decoration-none rounded-1 bg-header text-white mt-2 text-nowrap d-md-none position-absolute top-0"
+                    style="right: 0;">
+                    <img src="~/images/icons/export-white.svg" width="24px">
+                    <span> Export</span>
+                </button>
+
+                <button type="submit"
+                    class="btn btn-primary py-2 px-3 text-decoration-none rounded-1 bg-header text-white text-nowrap d-none d-md-block "
+                    style="width: fit-content; right: 0;">
+                    <img src="~/images/icons/export-white.svg" width="24px">
+                    <span> Export</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="date-search" class="row">
+    <div class="col-md"></div>
+    <div class="col-md-8 col-sm mb-2">
+        <div class="row">
+            <div class="col-sm">
+                <div class="form-floating mb-2">
+                    <input id="fromDate" type="date" name="fromDate" class="form-control" placeholder="Start Date">
+                    <label for="fromDate" class="z-1">From Date</label>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="form-floating mb-2">
+                    <input type="date" name="toDate" id="toDate" class="form-control" placeholder="End Date">
+                    <label for="toDate" class="z-1">To Date</label>
+                </div>
+            </div>
+            <div class="col-md-auto col-sm text-nowrap mt-2 ms-auto">
+                <button id="search-btn" type="submit"
+                    class="btn btn-primary py-2 px-3 text-decoration-none rounded-1 bg-header text-white text-nowrap">
+                    Search
+                </button>
+                <button id="clear-btn" type="reset"
+                    class="btn border-primary rounded-0 text-primary py-2 px-3 text-decoration-none rounded-1 text-nowrap">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+<div id="order-partial">
+</div>
+
+@section Scripts {
+    <script src="~/js/orders.js"></script>
+}

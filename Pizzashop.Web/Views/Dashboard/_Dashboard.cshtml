@@ -1,0 +1,214 @@
+@model Pizzashop.Entity.ViewModel.DashboardVM;
+
+@functions {
+    private string TimeDisplay(TimeSpan ts)
+    {
+        string time = "";
+        if (ts.Days > 0)
+        {
+            time += ts.Days + " days ";
+        }
+        if (ts.Hours > 0)
+        {
+            time += ts.Hours + " hrs ";
+        }
+        time += ts.Minutes + " mins ";
+
+        return time;
+    }
+}
+
+<div class="row mb-4 g-4">
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="d-flex flex-column justify-content-between card-sm bg-white shadow p-3">
+            <div class=" d-flex justify-content-end">
+                <div class="rounded-pill  sales-icon p-1">
+                    <div class="total-sale rounded-pill dashboard-icon">
+                        <img src="/images/icons/total-sales.svg" alt="null" class="m-1" height="20px" width="20px">
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-start align-items-end">
+                <div class="d-flex flex-column">
+                    <span class="fs-4">Rs. @Model.TotalSales.ToString("N2")</span>
+                    <span class="text-muted">Total Sales</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3 ">
+        <div class="d-flex flex-column justify-content-between card-sm bg-white shadow p-3">
+            <div class=" d-flex justify-content-end">
+                <div class="rounded-pill  orders-icon p-1">
+                    <div class="total-orders rounded-pill dashboard-icon">
+                        <img src="/images/icons/total-orders.svg" alt="null" class="m-1" height="20px" width="20px">
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-start align-items-end">
+                <div class="d-flex flex-column">
+                    <span class="fs-4">@Model.TotalOrder</span>
+                    <span class="text-muted">Total Orders</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3 ">
+        <div class="d-flex flex-column justify-content-between card-sm bg-white shadow p-3">
+            <div class=" d-flex justify-content-end">
+                <div class="rounded-pill  ordervalue-icon p-1">
+                    <div class="total-ordervalue rounded-pill dashboard-icon">
+                        <img src="/images/icons/order-value.svg" alt="null" class="m-1" height="20px" width="20px">
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-start align-items-end">
+                <div class="d-flex flex-column">
+                    <span class="fs-4">Rs. @Model.AvgOrderValue.ToString("F2")</span>
+                    <span class="text-muted">Avg.Order Value</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3 ">
+        <div class="d-flex flex-column justify-content-between card-sm bg-white shadow p-3">
+            <div class=" d-flex justify-content-end">
+                <div class="rounded-pill  waitingtime-icon p-1">
+                    <div class="total-waitingtime rounded-pill dashboard-icon">
+                        <img src="/images/icons/waiting-time.svg" alt="null" class="m-1" height="20px" width="20px">
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-start align-items-end">
+                <div class="d-flex flex-column">
+                    <span class="fs-4">@TimeDisplay(Model.AvgWaitingTime)</span>
+                    <span class="text-muted">Avg.Waiting Time</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4 g-4">
+
+    <div class="col-12 col-lg-6 ">
+        <div class="d-flex flex-column justify-content-between card-lg bg-white shadow p-3">
+            <span class="fs-4">Revenue</span>
+            <div class="h-100 p-2">
+                <canvas id="Revenue" style="height: 100%; width: 100%;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6 ">
+        <div class="d-flex flex-column justify-content-between card-lg bg-white shadow p-3">
+            <span class="fs-4">Customer Growth</span>
+            <div class="h-100 p-2">
+                <canvas id="CustomerGrowth"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-md-6 col-xxl-3 ">
+        <div class="d-flex flex-column justify-content-between card-md bg-white shadow p-3">
+            <span class="fs-5 mb-3">Top Selling Items</span>
+            <div>
+                @if (!Model.TopSellingItems.Any())
+                {
+                    <div class="text-center">No Order Found!</div>
+                }
+                @for (int i = 1; i <= Model.TopSellingItems.Count; i++)
+                {
+                    var item = Model.TopSellingItems[i - 1];
+                    <div class="d-flex">
+                        <div class="d-flex align-items-center">
+                            <span class="fw-bold fs-5 text-muted me-1">#@i</span>
+                            <img src='@((string.IsNullOrEmpty(item.Image)) ? "../images/dining-menu.png" : Url.Content("~/Uploads/" + item.Image))'
+                                width="40px" height="40px" class="rounded-circle" alt="null">
+                        </div>
+                        <div class="ms-2">
+                            <span>@item.Name</span>
+                            <div>
+                                <i class="fa-solid fa-bell-concierge"></i>
+                                <span class=" fs-6">@item.OrderCount order</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="m-0">
+                }
+            </div>
+            <div class="mb-1">
+
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xxl-3 ">
+        <div class="d-flex flex-column justify-content-between card-md bg-white shadow p-3">
+            <span class="fs-5 mb-3">Least Selling Items</span>
+            <div>
+                @if (!Model.LeastSellingItems.Any())
+                {
+                    <div class="text-center">No Order Found!</div>
+                }
+                @for (int i = 1; i <= Model.LeastSellingItems.Count; i++)
+                {
+                    var item = Model.LeastSellingItems[i - 1];
+                    <div class="d-flex">
+                        <div class="d-flex align-items-center">
+                            <span class="fw-bold fs-5 text-muted me-1">#@i</span>
+                            <img src='@((string.IsNullOrEmpty(item.Image)) ? "../images/dining-menu.png" : Url.Content("~/Uploads/" + item.Image))'
+                                width="40px" height="40px" class="rounded-circle" alt="null">
+                        </div>
+                        <div class="ms-2">
+                            <span>@item.Name</span>
+                            <div>
+                                <i class="fa-solid fa-bell-concierge"></i>
+                                <span class=" fs-6">@item.OrderCount order</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="m-0">
+                }
+            </div>
+            <div class="mb-1">
+
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xxl-3 ">
+        <div class="d-flex flex-column justify-content-between card-md bg-white shadow p-3">
+            <div class=" d-flex justify-content-end">
+                <div class="rounded-pill  waiting-list-count-border p-1">
+                    <div class="waiting-list-count-bg rounded-pill dashboard-icon">
+                        <img src="/images/icons/waiting-list.svg" alt="null" class="m-1" height="20px" width="20px">
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-start align-items-end">
+                <div class="d-flex flex-column">
+                    <span class="fs-4">@Model.WaitingListCount</span>
+                    <span class="text-muted">Waiting List Count</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xxl-3 ">
+        <div class="d-flex flex-column justify-content-between card-md bg-white shadow p-3">
+            <div class=" d-flex justify-content-end">
+                <div class="rounded-pill  new-customer-border p-1">
+                    <div class="new-customer-bg rounded-pill dashboard-icon">
+                        <img src="/images/icons/customer.svg" alt="null" class="m-1" height="20px" width="20px">
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-start align-items-end">
+                <div class="d-flex flex-column">
+                    <span class="fs-4">@Model.NewCustomerCount</span>
+                    <span class="text-muted">New Customer Count</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

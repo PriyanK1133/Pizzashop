@@ -1,0 +1,189 @@
+@model Pizzashop.Entity.ViewModel.OrderDetailsVM;
+@{
+    ViewData["Title"] = "Order-Details";
+}
+
+<iframe id="download-iframe" name="download-iframe" style="display:none;"></iframe>
+
+
+<div class="container mx-auto">
+
+    <div class="d-sm-flex justify-content-between mb-2">
+        <h1 class="text-header mb-3">Order-Details</h1>
+        <div class="d-flex gap-2 m-2 justify-content-end align-items-center ">
+            <a asp-action="Index" asp-route-id="" class="btn py-2 px-3 border-primary text-header">Back</a>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div id="order-summary" class="bg-white p-3 rounded-1 mb-3">
+            <div class="d-md-flex justify-content-between align-items-center">
+                <div class="d-flex gap-2">
+                    <h3>Order Summary </h3>
+
+                    <div class="align-content-center">
+                        @if (Model.Status.Equals(Constants.OrderInProgress))
+                        {
+                            <span
+                                class="bg-info bg-opacity-25 align-content-center px-2 py-md-2 fw-bold text-info-emphasis">In Progress</span>
+
+                        }
+                        else if (Model.Status.Equals(Constants.OrderCompleted))
+                        {
+                            <span
+                                class="bg-success bg-opacity-25 align-content-center px-2 py-md-2 fw-bold text-success-emphasis">Completed</span>
+                        }
+                        else if (Model.Status.Equals(Constants.OrderPending))
+                        {
+                            <span
+                                class="bg-secondary bg-opacity-25 align-content-center px-2 py-md-2 fw-bold text-secondary-emphasis">Pending</span>
+                        }
+                        else if (Model.Status.Equals(Constants.OrderRunning))
+                        {
+                            <span
+                                class="bg-warning bg-opacity-25 align-content-center px-2 py-md-2 fw-bold text-warning-emphasis">Running</span>
+                        }
+                        else
+                        {
+                            <span
+                                class="bg-primary bg-opacity-25 align-content-center px-2 py-md-2 fw-bold text-primary-emphasis">@Model.Status</span>
+                        }
+                    </div>
+                </div>
+                <a id="export-btn" type="submit" asp-action="GenerateInvoice" target="#download-frame" asp-route-id="@Model.Id"
+                    class="btn btn-primary py-md-2 px-3 text-decoration-none rounded-1 bg-header text-white m-2 text-nowrap fw-bold float-end">
+                    <img src="~/images/icons/export-white.svg" width="24px" class="me-2">
+                    <span> Export</span>
+                </a>
+            </div>
+            <p>
+                <span class="fw-bold">Invoice No. :</span> &nbsp;
+                <span id="invoice-no">#@Model.Id.ToString()[^5..].ToUpper()</span>
+            </p>
+            <div class="mb-2">
+                <span class="fw-bold">Paid On : <span></span>
+                    &emsp;
+                    Placed On :</span>
+                <span id="placed-on">@Model.PlacedOn</span> &nbsp;
+                <span class="fw-bold">Modified On :</span>
+                <span id="modified-on">@Model.ModifiedOn</span> &nbsp;
+                <span class="fw-bold">Order Duration :</span>
+                <span id="order-duration">@Model.OrderDuration.ToString("dd\\:hh\\:mm\\:ss")</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row gap-2 mb-3">
+        <div id="customer-details" class="col-md bg-white">
+            <div class="p-3">
+                <div class="d-flex gap-2 align-items-center mb-3">
+                    <img src="~/images/icons/customer.svg" alt="" width="30px">
+                    <h4>Customer Details</h4>
+                </div>
+                <div class="customer-info">
+                    <p>Name : <span>@Model.CustomerDetails.Name</span></p>
+                    <p>Phone : <span>@Model.CustomerDetails.Phone</span></p>
+                    <p>No. of Persons : <span>@Model.CustomerDetails.NumberOfPerson</span></p>
+                    <p>Email : <span>@Model.CustomerDetails.Email</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="table-details" class="col-md bg-white">
+            <div class="p-3">
+                <div class="d-flex gap-2 align-items-center mb-3">
+                    <img src="~/images/icons/dinner-table.svg" alt="" width="30px">
+                    <h4>Table Details</h4>
+                </div>
+                <div>
+                    <p>Table :
+                        @for (int i = 0; i < @Model.TableNames.Count; i++)
+                        {
+                            <span>@Model.TableNames[i]
+                            </span>
+                            @if (i < (@Model.TableNames.Count - 1))
+                            {
+                                <span>,</span>
+                            }
+
+                        }
+                    </p>
+                    <p>Section : <span>@Model.SectionName</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="order-items" class="bg-white">
+            <h4>Order Items</h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <th>Sr. No.</th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total Amount</th>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < @Model.OrderItems.Count; i++)
+                        {
+                            <tr>
+                                <td>@(i + 1)</td>
+                                <td>
+                                    @Model.OrderItems[i].Name
+                                    <ul class="modifier">
+                                        @foreach (var modifier in @Model.OrderItems[i].OrderModifiers)
+                                        {
+                                            <li>@modifier.Name</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
+                                    @Model.OrderItems[i].Quantity
+                                    <ul class="list-unstyled">
+                                        @foreach (var modifier in @Model.OrderItems[i].OrderModifiers)
+                                        {
+                                            <li>@modifier.Quantity</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
+                                    @Model.OrderItems[i].Price
+                                    <ul class="list-unstyled">
+                                        @foreach (var modifier in @Model.OrderItems[i].OrderModifiers)
+                                        {
+                                            <li>@modifier.Price</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
+                                    @Model.OrderItems[i].TotalAmount
+                                    <ul class="list-unstyled">
+                                        @foreach (var modifier in @Model.OrderItems[i].OrderModifiers)
+                                        {
+                                            <li>@modifier.Price</li>
+                                        }
+                                    </ul>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end">
+                <div class="fw-bold mb-3 col-md-3 col-6 col-sm-4">
+                    <div class=" d-flex justify-content-between">Subtotal :<span>Rs. @Model.SubTotal</span></div>
+                    @foreach (var tax in @Model.OrderTaxes)
+                    {
+                        <div class="d-flex justify-content-between">@tax.Name :<span>Rs. @tax.TotalTax</span></div>
+                    }
+                    <div class="d-flex justify-content-between">Total :<span>Rs. @Model.TotalAmount</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

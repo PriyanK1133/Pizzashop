@@ -1,0 +1,24 @@
+.status-indicator {
+    height: 12px;
+    width: 12px;
+  }
+  
+   .accordion-button {
+     transform: rotate(-90deg) ;
+     box-shadow: none !important;
+     border: 2px solid var(--bs-secondary) !important;
+     background-color: transparent !important;
+     border-radius: 50% !important;
+   }
+   
+  .accordion-button:not(.collapsed) {
+    transform: rotate(180deg) ;
+    box-shadow: none !important;
+    border: 2px solid #0066A7 !important;
+    background-color: transparent !important;
+    border-radius: 50% !important;
+  }
+
+  .section-card{
+    color: var(--primary-color);
+  }

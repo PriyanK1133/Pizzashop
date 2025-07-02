@@ -1,0 +1,126 @@
+@model IEnumerable<SectionVM>;
+@{
+    ViewData["Title"] = "Waiting List | OrderApp";
+    Layout = "_OrderApp";
+}
+
+<!-- Add Waitng Token Modal -->
+<div class="modal fade" id="waiting-token-modal" tabindex="-1" aria-labelledby="waiting-token-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h1 class="modal-title fs-5" id="waiting-token-modal-label">Waiting Token Details</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="waiting-token-form" class="modal-body">
+                <partial name="_CustomerDetails" model="new CustomerDetailsVM()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Waitng Token Modal -->
+<div class="modal fade" id="edit-waiting-token-modal" tabindex="-1" aria-labelledby="waiting-token-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered ">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h1 class="modal-title text-secondary fs-5" id="waiting-token-modal-label">Waiting Token Details</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="edit-waiting-token-form" class="modal-body">
+                <partial name="_CustomerDetails" model="new CustomerDetailsVM()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Waiting Token Modal -->
+<div id="delete-waiting-token-modal">
+    <partial name="_DeleteConfirmationModal" model='new String("Are you sure you want to cancel Waiting TKoken?")' />
+</div>
+
+<!-- Assign Table Modal -->
+<div class="modal fade" id="assign-tables-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h1 class="modal-title text-secondary fs-5" id="waiting-token-modal-label">Assign Table</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id='assign-tables-form'>
+                <div class="modal-body row">
+                    <div class="col-sm">
+                        <div class="form-floating  mb-sm-2 ">
+                            <select role="button" id="assign-section" name="section" class="form-select dd-section"
+                                required>
+                                <option disabled>Please select one</option>
+                            </select>
+                            <label for="assign-section">Section* <span class="text-danger">(Required)</span></label>
+                        </div>
+                        <span class="text-danger" id="assign-section-error"></span>
+                    </div>
+                    <div class="col-md mb-sm-2">
+                        <div class="dropdown w-100 ">
+                            <button
+                                class="btn form-control dropdown-toggle w-100 text-start border-secondary border-opacity-25 py-3 text-secondary"
+                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Table(s)* <span class="text-danger me-3">(Required)</span>
+                            </button>
+                            <ul id="dd-tables" class="dropdown-menu w-100" aria-labelledby="multiSelect">
+                                <li class="ms-3">Select Table</li>
+                            </ul>
+                        </div>
+                        <span class="text-danger" id="assign-tables-error"></span>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary bg-header rounded-1 mb-2 me-2">Assign</button>
+                    <button type="reset" class="btn btn-secondary rounded-1 mb-2 assign-table-cancel-btn"
+                        data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="d-flex my-2 justify-content-between align-items-center">
+    <div class="text-header">
+        <h3>Waiting List</h3>
+    </div>
+    <div>
+        <button class="border-primary btn text-header rounded-0 text-nowrap waiting-token-btn">
+            + <span class="d-none d-sm-inline">Waiting Token</span>
+        </button>
+    </div>
+</div>
+
+<div>
+    <ul id="section-list" class="nav bg-white nav-pills mb-2 overflow-x-auto flex-nowrap shadow-lg" id="pills-tab"
+        role="tablist">
+        <li class="nav-item">
+            <button id="all" class="nav-link section-tab active text-nowrap " type="button" data-bs-toggle="tab"
+                data-name="All" role="tab">
+                All <span class="badge text-bg-secondary bg-opacity-50 rounded-circle all-count"></span>
+            </button>
+        </li>
+        @foreach (var item in Model)
+        {
+            <li class="nav-item">
+                <button class="nav-link section-tab text-nowrap " type="button" data-bs-toggle="tab"
+                    data-section-id="@item.Id" role="tab">
+                    @item.Name <span id="@item.Id-count"
+                        class="badge text-bg-secondary bg-opacity-50 rounded-circle list-count">@item.WaitingCustomers</span>
+                </button>
+            </li>
+        }
+    </ul>
+
+    <div id="waiting-list-partial">
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/orderapp-waitinglist.js"></script>
+}

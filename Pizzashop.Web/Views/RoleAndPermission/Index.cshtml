@@ -1,0 +1,35 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.RoleVM>;
+
+@{
+    ViewData["Title"] = "RolesAndPermissions";
+}
+
+<h1 class="text-header">Role/Permissions</h1>
+
+<!-- Table  -->
+<div class="bg-white p-3 mt-2 container mt-4">
+    <table class="table ">
+        <thead>
+            <tr>
+                <th class="text-secondary" scope="col">Role</th>
+                <th scope="col" class="text-end text-secondary">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model)
+            {
+                <tr>
+                    <td>@role.Name</td>
+                        <td class="text-end">
+                    @if (RolePriority.GetRolePriority(User.Claims.FirstOrDefault(u => u.Type == ClaimTypes.Role)?.Value) >
+                        RolePriority.GetRolePriority(role.Name))
+                    {  
+                            <a asp-action="permissions" asp-route-id="@role.Id">
+                            <img src="./images/icons/edit-pen.svg" alt=""></a>
+                    }
+                        </td>
+                </tr>
+                }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,135 @@
+@model Pizzashop.Entity.ViewModel.RoleAndPermissionVM;
+@{
+    ViewData["Title"] = "Permissions";
+}
+
+<!-- TITLE  -->
+<div class="title d-flex flex-wrap justify-content-between align-items-center mb-2">
+    <h1 class="text-header">Permissions</h1>
+    <a asp-action="Index" class="btn d-flex align-items-center gap-2 border-primary text-header">
+        <span class="fs-4 fw-bold">&lt; </span>Back</a>
+</div>
+
+<form method="post" asp-action="Permissions">
+
+    <!-- Table  -->
+    <div class=" bg-white p-md-3 shadow-lg table-responsive">
+        <!-- ROLE  -->
+        <div class="col-md-6 p-2 mb-3">
+            <div class="form-floating">
+                <select class="form-control" disabled asp-for="RoleId" id="floatingSelect"
+                    aria-label="Floating label select example" asp-items="@ViewBag.Roles">
+                    <option disabled selected>Select Role</option>
+                </select>
+                <label for="floatingSelect">Role</label>
+            </div>
+            <input type="hidden" asp-for="RoleId">
+        </div>
+
+        <table class="table table-hover  ">
+            <thead class="  border-dark ">
+                <tr>
+                    <th scope="col">
+                        <div class="form-check">
+                            <input class="form-check-input all-check" type="checkbox" value=""
+                                id="flexCheckIndeterminate">
+                            <label class="form-check-label" for="flexCheckIndeterminate">
+                                Permissions
+                            </label>
+                        </div>
+                    </th>
+                    <th scope="col">Can View</th>
+                    <th scope="col">Can Add/Update</th>
+                    <th scope="col">Can Delete</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (var i = 0; i < Model.Permissions.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <div class="form-check">
+                                <input checked="@(Model.Permissions[i].CanView)"
+                                    class="permission-checkbox form-check-input" type="checkbox"
+                                    id="@Model.Permissions[i].Id">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    @Model.Permissions[i].Name
+                                </label>
+                            </div>
+                            <input type="hidden" asp-for="@Model.Permissions[i].Id">
+                        </td>
+                        <td>
+                            <div class="form-check form-switch ms-4">
+                                <input data-id="@Model.Permissions[i].Id" asp-for="@Model.Permissions[i].CanView"
+                                    class="@Model.Permissions[i].Id view switch form-check-input fs-4" type="checkbox"
+                                    role="button" id="flexSwitchCheckDefault">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch ms-4">
+                                <input data-id="@Model.Permissions[i].Id" asp-for="@Model.Permissions[i].CanEdit"
+                                    class="@Model.Permissions[i].Id edit switch form-check-input fs-4" type="checkbox"
+                                    role="button" id="flexSwitchCheckDefault">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch ms-4">
+                                <input data-id="@Model.Permissions[i].Id" asp-for="@Model.Permissions[i].CanDelete"
+                                    class="@Model.Permissions[i].Id delete switch form-check-input fs-4" type="checkbox"
+                                    role="button" id="flexSwitchCheckDefault">
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end align-items-center gap-3 m-3">
+            <button type="submit" role="button" class="btn btn-primary bg-header">Save</button>
+            <a asp-action="Index" asp-controller="RoleAndPermission" role="button" type="button"
+                class="btn border-primary text-header">Cancel</a>
+        </div>
+</form>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if ($('.permission-checkbox:checked').length == $('.permission-checkbox').length) {
+                $(".all-check").prop("checked", true)
+            }
+            $(".all-check").change(function () {
+                var checked = $(this).is(':checked');
+                $(".permission-checkbox").prop("checked", checked)
+                $(".switch").prop("checked", checked);
+            })
+
+            $(".permission-checkbox").change(function () {
+                var id = $(this).attr('id');
+                var checked = $(this).is(':checked');
+                $(`.${id}`).prop("checked", checked);
+                var isAllChecked = $('.permission-checkbox:checked').length == $('.permission-checkbox').length;
+                $(".all-check").prop("checked", isAllChecked)
+            })
+
+            $(".switch").change(function () {
+                var id = $(this).data("id");
+                var checked = $(this).is(":checked");
+                if (checked) {
+                    $(`.${id}.view`).prop("checked", true);
+                    $(`#${id}`).prop("checked", checked)
+                }
+                else if ($(this).hasClass('view')) {
+                    $(`.${id}.edit`).prop("checked", false);
+                    $(`.${id}.delete`).prop("checked", false);
+                    $(`#${id}`).prop("checked", false)
+                }
+                var isAllChecked = $('.permission-checkbox:checked').length == $('.permission-checkbox').length;
+                $(".all-check").prop("checked", isAllChecked)
+            })
+        })
+
+    </script>
+}

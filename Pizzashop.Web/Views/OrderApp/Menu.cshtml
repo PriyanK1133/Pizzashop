@@ -1,0 +1,293 @@
+@model Pizzashop.Entity.ViewModel.OrderDetailsVM;
+
+@{
+    ViewData["Title"] = "Menu | OrderApp";
+    Layout = "_OrderApp";
+}
+
+@{
+    bool hasOrder = (Model != null);
+}
+
+<iframe id="download-iframe" name="download-iframe" style="display:none;"></iframe>
+
+@* Add Modifiers Modal  *@
+<div class="modal fade" id="add-modifiers-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title text-secondary fs-5">
+
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="add-modifiers-partial">
+
+            </div>
+            @if (hasOrder)
+            {
+                <div class="modal-footer ">
+                    <a id="add-btn" type="button" class="btn btn-primary bg-header me-2 rounded-1 px-3" data-item-id=""
+                        data-itemName="">Add</a>
+                    <button type="button" class="btn text-primary bg-white text-header border-primary rounded-1 px-3"
+                        data-bs-dismiss="modal">Close</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="qr-code-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-secondary">
+                    Menu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div id="qr-code" class="modal-body text-center">
+
+            </div>
+            <div class="text-center p-2">
+                <button type="button" class="btn btn-outline-header" data-bs-dismiss="modal">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (hasOrder)
+{
+    @* Customer Edit Modal  *@
+    <div id="menu-customer-details-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-secondary">
+                        Customer Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div id="menu-customer-details-partial" class="modal-body">
+                    <partial name="_MenuCustomerDetails" model="Model!.CustomerDetails" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="order-comment-modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-secondary">
+                        Order Wise Comment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="order-comment-form" class="w-100">
+                    <input type="hidden" asp-for="Id">
+                    <div class="modal-body">
+                        <div class="col mb-2">
+                            <div class="form-floating">
+                                <textarea asp-for="Comment" class="form-control" placeholder="Comment"
+                                    style="height: 100px;"></textarea>
+                                <label for="#order-comment">Comment</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-primary bg-header rounded-0"
+                            data-bs-dismiss="modal">Save</button>
+                        <button type="reset" class="btn btn-outline-header rounded-0"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="item-instruction-modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-secondary">
+                        Special Instruction
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="item-instruction-form" class="w-100">
+                    <input type="hidden" name="id">
+                    <div class="modal-body">
+                        <div class="col mb-2">
+                            <div class="form-floating">
+                                <textarea id="special-instruction" name="specialInstruction" class="form-control"
+                                placeholder="Instruction"></textarea>
+                                <label for="#special-instruction">Instruction</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-primary bg-header rounded-0"
+                            data-bs-dismiss="modal">Save</button>
+                        <button type="reset" class="btn btn-outline-header rounded-0"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    //cart btn
+    <div class=" d-lg-none rounded-circle shadow-lg cartBtnDiv rounded-circle">
+        <button id="orderDetailsDisplayBtn" data-bs-toggle="offcanvas" data-bs-target="#menu-table-offcanvas"
+            class="px-3 py-2 border-0 rounded-circle position-relative bg-transparent text-white shadow-sm" type="button">
+            <i class="bi bi-cart3 fs-3"></i>
+            <span id="order-item-count"
+                class="position-absolute top-0 start-95 translate-middle badge rounded-pill bg-danger">
+                0
+                <span class="visually-hidden">Ordered Items</span>
+            </span>
+        </button>
+    </div>
+
+    <div id="complete-order-confirmation-modal">
+        <partial name="_DeleteConfirmationModal" model='new String("Are you sure you want to complete Order?")' />
+    </div>
+
+    <div id="cancel-order-confirmation-modal">
+        <partial name="_DeleteConfirmationModal" model='new String("Are you sure you want to cancel Order?")' />
+    </div>
+
+    <div id="customer-review-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form asp-action="SaveRating" class="w-100">
+                    <input type="hidden" name="orderId" value="@Model.Id">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title text-secondary">
+                            Customer Review
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="text-secondary">Food</h6>
+                            <div class="star-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star" data-rating="@i"><i class="far fa-star text-header"></i></span>
+                                }
+                                <input type="hidden" name="foodRating" value="0">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="text-secondary">Service</h6>
+                            <div class="star-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star" data-rating="@i"><i class="far fa-star text-header"></i></span>
+                                }
+                                <input type="hidden" name="serviceRating" value="0">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="text-secondary">Ambience</h6>
+                            <div class="star-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star" data-rating="@i"><i class="far fa-star text-header"></i></span>
+                                }
+                                <input type="hidden" name="ambienceRating" value="0">
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="col mb-2">
+                            <div class="form-floating">
+                                <textarea name="comment" class="form-control" placeholder="Comment"
+                                style="height: 100px;"></textarea>
+                                <label for="#order-comment">Comment</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center p-2">
+                        <button type="submit" class="btn btn-primary bg-header">Save</button>
+                        <a type="button" asp-action="Tables" class="btn btn-outline-header">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+<div class="row">
+    <!-- Sidebar  -->
+    <div class="col-auto p-0 " id="category-sidebar">
+        <div class=" offcanvas-lg offcanvas-start bg-light h-100" id="category-offcanvas"
+            aria-labelledby="offcanvasExampleLabel">
+
+            <div class="offcanvas-header">
+                <div class="d-flex align-items-center gap-3 " id="offcanvasExampleLabel">
+                    <h4 class="text-dark"> </h4>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-toggle="offcanvas" data-bs-target="#category-offcanvas"
+                    aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-body p-0">
+                <div class="sidebar py-4  w-100">
+                    <div class="d-none d-lg-block header px-3">
+                        <h5 class="">Category</h5>
+                    </div>
+                    <ul class="nav mt-lg-3 d-flex flex-column text-secondary" id="category-list">
+                        <li role="button" class="category-tab fw-semibold px-3 py-2" data-id="favourite">Favourite Items
+                        </li>
+                        <li role="button" class="category-tab active fw-semibold px-3 py-2">All</li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="d-sm-flex justify-content-between align-items-center mt-2">
+            <div class="col-10 col-sm-4">
+                <div class="input-group ">
+                    <input type="text" name="search " id="item-search" placeholder="Search"
+                        class="form-control border-end-0">
+                    <span class="input-group-text bg-white border-start-0">
+                        <img src="~/images/icons/search.svg" alt="" width="24px">
+                    </span>
+                </div>
+            </div>
+            <div class="d-flex ms-2 gap-3 flex-wrap">
+                <span class="d-flex  align-items-center gap-2">
+                    <div class="indicator bg-success rounded-circle"></div> Vegetarian
+                </span>
+                <span class="d-flex align-items-center gap-2">
+                    <div class="indicator bg-danger rounded-circle"></div> Non-Vegetarian
+                </span>
+                <span class="d-flex align-items-center gap-2">
+                    <div class="indicator bg-warning   rounded-circle"></div> Vegan
+                </span>
+            </div>
+        </div>
+        <div id="menu-items-partial">
+        </div>
+    </div>
+
+    @if (hasOrder)
+    {
+        <div class="col-lg-5" id="menu-table-sidebar">
+            <partial name="_MenuTable" model="Model" />
+        </div>
+
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <script src="~/js/orderapp-menu.js"> </script>
+}

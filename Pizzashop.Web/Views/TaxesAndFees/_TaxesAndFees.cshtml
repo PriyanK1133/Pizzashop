@@ -1,0 +1,77 @@
+@model Pizzashop.Entity.ViewModel.PagedResult<Pizzashop.Entity.ViewModel.TaxAndFeeVM>;
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+<div id="taxes-and-fees" class="bg-white rounded-1">
+    <div class="table-responsive">
+        <table class="table table-hover shadow-sm">
+            <thead class="border-dark">
+                <th scope="col">Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">IsEnabled</th>
+                <th scope="col">Default</th>
+                <th scope="col">Tax Value</th>
+                <th scope="col">Action</th>
+            </thead>
+            <tbody>
+                @if (Model.PagedList.Any())
+                {
+
+                    @foreach (var item in Model.PagedList)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Type</td>
+                            <td>
+                                <div class="form-check form-switch ">
+                                    <input class="form-check-input fs-6" asp-for="@item.IsEnabled" role="button"
+                                        onclick="return false">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch d-flex justify-content-between">
+                                    <input class="form-check-input fs-6" asp-for="@item.IsDefault" role="button"
+                                        onclick="return false">
+                                </div>
+                            </td>
+                            @if (item.Type == Constants.TaxPercentage)
+                            {
+                                <td>@item.TaxAmount%</td>
+                            }
+                            else
+                            {
+                                <td>Rs. @item.TaxAmount</td>
+                            }
+                            <td>
+                                <a role="button" type="button" class="btn edit-tax-btn" data-id="@item.Id">
+                                    <img src="~/images/icons/edit-pen.svg" alt="" width="20px">
+                                </a>
+                                <button type="button" class="btn delete-tax-btn" data-id="@item.Id" disabled="@(!canDelete)">
+                                    <img src="~/images/icons/trash.svg" alt="" width="20px">
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="text-center" colspan="6">No Taxes/Fees Found!</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div id="tax-pagination">
+        <partial name="_Pagination" model="@Model.Pagination" />
+    </div>
+</div>
+
+<script>
+    page = @Model.Pagination.CurrentPage;
+    pagesize = @Model.Pagination.PageSize;
+</script>

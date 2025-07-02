@@ -1,0 +1,110 @@
+@model Pizzashop.Entity.ViewModel.PagedResult<Pizzashop.Entity.ViewModel.ModifierListVM>;
+
+@{
+    string message = "Are you sure you want to delete Modifier?";
+    string allDelete = "Are you sure you want to delete all selected Modifiers?";
+}
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+
+<div id="delete-modifier-modal">
+    <partial name="_DeleteConfirmationModal" model="message" />
+</div>
+
+<div id="multiple-modifier-delete-modal">
+    <partial name="_DeleteConfirmationModal" model="allDelete" />
+</div>
+<div class="table-responsive table-scroll">
+    <table class="table table-hover ">
+        <thead class="text-center border-dark z-1">
+            <tr>
+                <th scope="col">
+                    <div class="form-check text-start">
+                        <input class="permission-checkbox  all-modifier-check me-2" type="checkbox" value=""
+                            id="flexCheckIndeterminate">
+                        <label class="form-check-label" for="flexCheckIndeterminate">
+                            Name
+                        </label>
+                    </div>
+                </th>
+                <th scope="col">Unit</th>
+                <th scope="col">Rate</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+
+        <tbody class="text-center">
+            @if (Model.PagedList.Any())
+            {
+                @foreach (var item in Model.PagedList)
+                {
+                    <tr class="align-content-center">
+                        <td class="text-start ">
+                            <div class="form-check d-flex align-items-center ">
+                                <input class="modifier-check  me-2" type="checkbox" data-id="@item.Id">
+                                <div class="form-check-label" for="flexCheckDefault">
+                                    @if (item.Name.Length > 15)
+                                    {
+                                        <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                            data-bs-custom-class="custom-tooltip" data-bs-title="@item.Name">
+                                            @(item.Name.Substring(0, 15) + "...")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.Name</span>
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @item.Unit
+                        </td>
+                        <td>
+                            @item.Rate
+                        </td>
+                        <td>
+                            @item.Quantity
+                        </td>
+                        <td>
+                            @if (canEdit)
+                            {
+                                <a title="Edit" role="button" type="button" class="btn edit-modifier-btn" data-id="@item.Id">
+                                    <img src="~/images/icons/edit-pen.svg" alt="">
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="disabled btn"><img src="~/images/icons/edit-pen.svg" alt=""></button>
+                            }
+                            <button title="Delete" type="button" class="btn delete-modifier-btn" data-bs-toggle="modal" disabled="@(!canDelete)"
+                                data-bs-target="#deleteModal" data-id="@item.Id">
+                                <img src="~/images/icons/trash.svg" alt="">
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6">No Modifiers Found!</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+<div id="modifier-pagination">
+    <partial name="_Pagination" model="@Model.Pagination" />
+</div>
+<script>
+    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>

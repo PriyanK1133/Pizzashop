@@ -1,0 +1,57 @@
+@model Pizzashop.Entity.ViewModel.PagedResult<Pizzashop.Entity.ViewModel.ModifierListVM>;
+<table class="table table-hover  ">
+    <thead class=" text-center border-dark ">
+        <tr>
+            <th scope="col">
+                <div class="form-check text-start">
+                    <input class=" all-select-modifier-check me-2" type="checkbox" value="" id="flexCheckIndeterminate">
+                    <label class="form-check-label" for="flexCheckIndeterminate">
+                        Name
+                    </label>
+                </div>
+            </th>
+            <th scope="col">Unit</th>
+            <th scope="col">Rate</th>
+            <th scope="col">Quantity</th>
+        </tr>
+    </thead>
+
+    <tbody class="text-center">
+        @if (Model.PagedList.Any())
+        {
+            @foreach (var modifier in Model.PagedList)
+            {
+                <tr class="align-content-center">
+                    <td class="text-start ">
+                        <div class="form-check d-flex align-items-center ">
+                            <input id="@modifier.Id" class="select-modifier-check  me-3" type="checkbox"
+                                data-obj='{"id": "@modifier.Id", "name":"@modifier.Name"}'>
+                            <div class="form-check-label" for="flexCheckDefault">
+                                <span class="ms-2"> @modifier.Name</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        @modifier.Unit
+                    </td>
+                    <td>
+                        @modifier.Rate
+                    </td>
+                    <td>
+                        @modifier.Quantity
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">No Modifiers Found!</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div id="select-modifier-pagination">
+    <partial name="_Pagination" model="@Model.Pagination"></partial>
+</div>

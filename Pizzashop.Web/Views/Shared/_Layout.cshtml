@@ -1,0 +1,238 @@
+﻿@using Pizzashop.Entity.Constants;
+@using Pizzashop.Service.Utils;
+@using Pizzashop.Entity.ViewModel;
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Pizzashop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Pizzashop.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+</head>
+
+<body>
+    @{
+
+        UserVM? user = SessionUtils.GetUser(Context);
+
+        string? userName = user?.UserName;
+        string? profileImage = user?.ProfileImage;
+        string? role = user?.Role;
+
+        List<string> permissionControllers = SessionUtils.GetPermissions(Context)!;
+        Dictionary<string, string> sections = PermissionControllerMap.GetControllers(permissionControllers);
+    }
+
+    @functions {
+        public string RemoveWhitespace(string input)
+        {
+            return new string(input.Where(c => !char.IsWhiteSpace(c)).ToArray());
+        }
+    }
+ @{
+        Func<string, string> IsSelected = (controller) =>
+        {
+            controller = @RemoveWhitespace(controller);
+            if (ViewContext.RouteData.Values["controller"]!.ToString() == controller)
+            {
+                return "active";
+            }
+            return string.Empty;
+        };
+    }
+
+    @* Logout modal  *@
+    <div class="modal fade " id="logoutModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title text-secondary fs-5" id="exampleModalLabel">
+                        Logout Confirmation
+                    </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="~/images/toppng.com-warning-icon-2400x2400.png" width="35px" alt="" class="mb-2">
+                    <p>Are you sure you want to Logout?</p>
+                </div>
+                <div class="text-center mb-3">
+                    <a id="logout-btn" type="button" class="btn btn-primary bg-header me-2 rounded-0 px-3"
+                        asp-action="Logout" asp-controller="Account">Yes</a>
+                    <button type="button" class="btn text-primary bg-white text-header border-primary rounded-0 px-3"
+                        data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row ">
+            @if (role != Constants.Chef)
+            {
+                <!-- Sidebar  -->
+                <div class="col-auto p-0 bg-white min-vh-100 z-3">
+                    <div class=" position-sticky top-0">
+                        <div class=" offcanvas-lg offcanvas-start" tabindex="-1" id="offcanvasExample"
+                            aria-labelledby="offcanvasExampleLabel">
+
+                            <div class="offcanvas-header">
+                                <div class="d-flex align-items-center gap-3 " id="offcanvasExampleLabel">
+                                    <img src="~/images/logos/pizzashop_logo.png" class="img-fluid" width="75px">
+                                    <h2 class="text-header ">PIZZASHOP</h2>
+                                </div>
+
+                                <button type="button" class="btn-close" data-bs-toggle="offcanvas"
+                                    data-bs-target="#offcanvasExample" aria-label="Close"></button>
+                            </div>
+
+                            <div class="offcanvas-body ">
+                                <div class="sidebar py-4 ">
+                                    <div class="d-none d-lg-flex align-items-center px-3 gap-3 header">
+                                        <img src="~/images/logos/pizzashop_logo.png" class="img-fluid" width="70px">
+                                        <h3 class="">PIZZASHOP</h3>
+                                    </div>
+                                    <ul class="nav d-flex flex-column gap-2 mt-3 w-100">
+
+                                        @foreach (var s in sections)
+                                        {
+                                            <li class="nav-item d-flex">
+                                                <a href="@Url.Action("Index", @RemoveWhitespace(s.Key.ToString()))"
+                                                    class="nav-link d-flex align-items-center gap-2 @IsSelected(s.Key)">
+                                                    <img src="~/images/icons/@(s.Value)" width="30px">
+                                                    <span class="@IsSelected(s.Key)">@(s.Key)</span>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class=" col p-0 ">
+
+                <!-- Navbar -->
+                <nav class="navbar bg-header nav position-sticky top-0 z-2 ">
+                    <button class="btn d-lg-none bg-white fw-bold rounded-pill ms-2" type="button"
+                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+                        <img src="~/images/icons/menu-bar.svg">
+                    </button>
+
+                    <div class="d-flex align-items-center d-lg-none">
+                        <a asp-action="@(role == Constants.Chef ? "KOT" : "Index")"
+                            asp-controller="@(role == Constants.Chef ? "OrderApp" : "Dashboard")" class="btn p-1 d-flex  ">
+                            <div class="bg-white mx-2 align-content-center p-0">
+                                <img src="~/images/logos/pizzashop_logo.png" alt="" width="50px" class="">
+                            </div>
+                            <span class="text-white fs-2 d-none d-sm-block">Pizzashop</span>
+                        </a>
+                    </div>
+
+                    <div class="ms-auto d-flex gap-1 align-items-center">
+
+                        @if (Constants.AccountManager.Equals(role))
+                        {
+                            <a asp-controller="OrderApp" asp-action="Tables" class="text-white p-1 btn">
+                                <h4 class="m-0"><i class="bi bi-phone"></i></h4>
+                            </a>
+                        }
+                        else if (Constants.Chef.Equals(role))
+                        {
+                            <a asp-action="KOT" asp-controller="OrderApp"
+                                class="btn border rounded-pill py-1 px-3 me-2 text-white orderapp-options">
+                                <i class="bi bi-bag-dash-fill"></i>
+                                <span class="d-none d-md-inline">KOT</span>
+                            </a>
+                        }
+                        <div class="dropdown me-3 ">
+                            <div class="profile " type="button" data-bs-toggle="dropdown">
+                                <img src="@(string.IsNullOrEmpty(profileImage) ? Url.Content("/images/Default_pfp.svg.png") : Url.Content("/Uploads/" + profileImage))"
+                                    class="bg-light user-img rounded-circle " width="40px" height="40px">
+                            </div>
+                            <ul class="dropdown-menu dropdown-menu-end p-2">
+                                <li class=" d-flex align-items-center ">
+                                    <img src="@(string.IsNullOrEmpty(profileImage) ? Url.Content("/images/Default_pfp.svg.png") : Url.Content("/Uploads/" + profileImage))"
+                                        class="user-img bg-light rounded-circle " width="50px" height="50px">
+                                    <span class="dropdown-item-text text-secondary  text-nowrap">
+                                        @if (userName?.Length > 10)
+                                        {
+                                            <span>@userName.Substring(0, 10)...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@userName</span>
+                                        }
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item text-secondary" asp-action="Profile"
+                                        asp-controller="Home">
+                                        <i class="fa-solid fa-user li-click ps-1 me-2"></i>
+                                        My Profile</a></li>
+                                <li><a class="dropdown-item text-secondary" asp-action="ChangePassword"
+                                        asp-controller="Home">
+                                        <i class="fa-solid fa-rotate-right li-click ps-1 me-2"></i>
+                                        Change Password</a></li>
+                                <li><a type="button" class="dropdown-item text-secondary" data-bs-toggle="modal"
+                                        data-bs-target="#logoutModal">
+                                        <i class="fa-solid fa-right-from-bracket li-click ps-1 me-2"></i>
+                                        Logout
+                                    </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+
+                <!--  -->
+                <main role="main" class="container-fluid  ">
+                    <partial name="_Notification" />
+                    <partial name="_Loader" />
+                    @RenderBody()
+                </main>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "preventDuplicates": true,
+                "preventOpenDuplicates": true
+            };
+        });
+
+
+    </script> 
+    
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

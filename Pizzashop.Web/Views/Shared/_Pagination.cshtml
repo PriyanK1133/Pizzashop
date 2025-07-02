@@ -1,0 +1,47 @@
+@model Pizzashop.Entity.ViewModel.Pagination;
+@{
+    List<int> pageOptions = new List<int> { 5, 10, 15 };
+}
+<div class=" d-flex justify-content-end gap-2 align-items-center p-1 pagination">
+    <span>Items Per Page :</span>
+    <div class="itemperpage">
+
+        <select name="pagesize" id="pagesizelist" class="form-control form-select">
+            @foreach (int option in pageOptions)
+            {
+                var isSelected = Model.PageSize == option;
+                if (isSelected)
+                {
+                    <option value="@option" selected>
+                        @option</option>
+                }
+                else
+                {
+                    <option value="@option">@option</option>
+                }
+            }
+        </select>
+    </div>
+
+    <span>Showing @Model.FromRec - @Model.ToRec of @Model.TotalRecords</span>
+
+    <nav aria-label="Page navigation example ">
+        <ul class="pagination pt-1">
+            <li class="page-item me-2 ">
+                <button disabled="@(Model.CurrentPage <= 1)" type="button" role="button" class="page-link  btn"
+                    aria-label="Previous" id="prev-page-btn">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only"></span>
+                </button>
+            </li>
+            <li class="page-item">
+                <button disabled="@(Model.CurrentPage >= Model.TotalPages)" type="button" role="button"
+                    class="btn page-link " aria-label="Next" id="next-page-btn">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only"></span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+</div>

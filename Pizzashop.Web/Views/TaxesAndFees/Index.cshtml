@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Taxes/Fees";
+    string deleteTaxMessage = "Are you sure you want to delete Tax?";
+}
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+
+<div class="d-sm-flex justify-content-between">
+    <h1 class="text-header mb-3">Taxes/Fees</h1>
+    <div class="d-flex gap-2 m-2 justify-content-end align-items-center ">
+        <div class="input-group w-50">
+            <input type="text" name="search " id="search-tax" placeholder="Search" class="form-control border-end-0">
+            <span class="input-group-text bg-white border-start-0">
+                <img src="~/images/icons/search.svg" alt="" width="24px">
+            </span>
+        </div>
+
+        <button id="add-tax-btn" type="button" data-bs-toggle="modal" data-bs-target="#add-tax-modal"
+            disabled="@(!canEdit)"
+            class="btn btn-primary py-2 px-3 text-decoration-none rounded-0 bg-header text-white ms-1 text-nowrap">
+            <span> + New Tax</span>
+        </button>
+    </div>
+</div>
+<div id="taxes-and-fees-partial">
+
+</div>
+
+<form id="add-tax-form">
+    <div class="modal fade" id="add-tax-modal">
+        <partial name="_AddTax"/>
+    </div>
+</form>
+
+<form id="edit-tax-form">
+    <div class="modal fade" id="edit-tax-modal">
+
+    </div>
+</form>
+
+<div id="delete-tax-modal">
+    <partial name="_DeleteConfirmationModal" model="@deleteTaxMessage" />
+</div>
+
+@section Scripts {
+    
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+    <script src="~/js/taxes-and-fees.js"></script>
+}

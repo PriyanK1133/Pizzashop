@@ -1,0 +1,11 @@
+.nav-link{
+    color: black;
+
+}
+.nav-pills .nav-link.active{
+    background-color: transparent;
+    color: var(--primary-color);
+    font-weight: bold;
+    border-bottom: 2px solid var(--primary-color);
+    border-radius: 0;
+}

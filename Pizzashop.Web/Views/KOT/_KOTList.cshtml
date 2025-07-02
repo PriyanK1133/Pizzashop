@@ -1,0 +1,100 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.KOTOrderVM>;
+
+<div id="kot-carousel" class="carousel carousel-dark slide" data-bs-ride="false" data-bs-wrap="false">
+    <div class=" carousel-inner">
+
+        @if (!Model.Any())
+        {
+            <div class="text-center w-100 fs-4 mb-5">No KOT Orders Found!</div>
+            return;
+        }
+        @{
+            var k = 0;
+            var size = 4;
+        }
+
+        @for (int i = 0; i < Model.Count(); i += size)
+        {
+            <div class=" card-group carousel-item @(i == 0 ? "active" : "")">
+                <div class="d-flex flex-wrap gap-2">
+                    @for (int j = i; j < (i + size); j++)
+                    {
+                        if (j >= Model.Count())
+                        {
+                            break;
+                        }
+
+                        var order = Model.ElementAt(j);
+
+                        <div type="button" onclick="openKOTOrder(@Html.Raw(Json.Serialize(order)).ToString())"
+                            class="card border-secondary border-dashed p-0 mb-2">
+                            <div class="card-header bg-secondary-subtle p-1 ">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="text-header">#@order.Id.ToString().ToUpper()[^5..]</h5>
+                                    <small class="text-secondary "><i class="bi bi-stopwatch"></i>
+                                        <span class="live-time" data-time="@order.CreatedAt.ToString("o")"></span> </small>
+                                </div>
+                                <div><span>@order.SectionName</span> &#x2022;
+                                    @for (int t = 0; t < order.TableNames.Count; t++)
+                                    {
+                                        <span>@order.TableNames[t]
+                                        </span>
+                                        @if (t < (order.TableNames.Count - 1))
+                                        {
+                                            <span>,</span>
+                                        }
+
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="card-body p-2">
+                                @foreach (var item in order.OrderItems)
+                                {
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between"><span
+                                                class="text-secondary">@item.Name</span><span>@item.Quantity</span>
+                                        </div>
+                                        <ul class="m-1">
+                                            @foreach (var modifier in item.OrderModifiers)
+                                            {
+                                                <li class="text-secondary">@modifier.Name </li>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.Instruction))
+                                            {
+                                                <div><span class="text-info">Instruction:</span> @item.Instruction </div>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="card-footer p-1">
+                                @if (!string.IsNullOrEmpty(order.OrderInstruction))
+                                {
+                                    <span class="text-info">Order Instruction:</span>
+                                    <span> @order.OrderInstruction </span>
+                                }
+                            </div>
+                        </div>
+                    }
+                    @{
+                        k++;
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div>
+
+        <div class="carousel-indicators ">
+            @for (int i = 0; i < k; i++)
+            {
+                <button id="@i-carousel-indicator-btn" type="button" data-bs-target="#kot-carousel" data-bs-slide-to="@i"
+                    class="@(i == 0 ? "active" : "") carousel-indicator-btn" aria-current="@(i == 0 ? "true" : "")"
+                    aria-label="Slide @(i + 1)"></button>
+            }
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,174 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #0066a7;
+  --secondary-color: #d8eff7;
+}
+
+body {
+  background-color: #f2f2f2;
+  min-height: 100vh;
+  font-family: "Roboto", serif;
+}
+
+.dropdown-item:hover{
+  color: var(--primary-color) !important;
+}
+
+.text-header {
+  color: var(--primary-color);
+}
+
+.bg-header {
+  background-color: var(--primary-color);
+}
+
+.border-header {
+  border-color: var(--primary-color);
+}
+.border-header:hover {
+  border-color: black;
+}
+
+.btn-outline-header {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline-header:hover {
+  color: white;
+  background-color: var(--primary-color);
+  opacity: 0.9;
+}
+
+.btn-outline-header:disabled, .btn-outline-header.disabled {
+  opacity: 0.7;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+section {
+  background-color: #f2f2f2;
+}
+
+.border-dashed {
+  border: 1px dashed;
+}
+
+.for-grab {
+  cursor: grab;
+}
+
+.input-validation-error, .input-validation-error:focus
+{
+    border: 1px solid #CD0A0A;
+}
+
+.custom-tooltip {
+  --bs-tooltip-bg: white;
+  --bs-tooltip-color: black;
+  font-weight: bold;
+}
+
+table {
+  font-size: 0.8rem;
+  td{
+    white-space: nowrap;
+  }
+}
+
+/* List And Table  */
+
+.utility-btn {
+  visibility: hidden;
+}
+
+.list-item {
+  font-weight: 500;
+  .nav-link {
+    color: black;
+  }
+}
+
+.list {
+  min-width: 280px;
+  background: linear-gradient(to right, white, rgb(225, 224, 224));
+}
+
+.list-item.active,
+.list-item:hover {
+  .nav-link {
+    background-color: transparent;
+    border-radius: 0;
+    color: var(--primary-color);
+  }
+  .utility-btn {
+    visibility: visible;
+  }
+}
+
+.menu-tab {
+  height: 50vh;
+  min-width: 225px;
+}
+
+.table-scroll {
+  max-height: 38vh;
+  overflow-y: auto;
+  thead {
+    position: sticky;
+    top: 0;
+  }
+}
+
+.error {
+  color: red;
+}
+
+/* Kot  */
+#kot-order-items .quantity-btn {
+  width: 150px;
+  height: 50px;
+  display: flex;
+}
+
+/* Order Items  */
+#order-items .accordion-button {
+  transform: rotate(-90deg);
+  transition: all 0.3s ease;
+}
+#order-items .accordion-button:focus{
+  box-shadow: none;
+  outline: none;
+}
+
+#order-items .accordion-button:not(.collapsed) {
+  transform: rotate(-180deg);
+  box-shadow: none !important;
+}
+
+#order-items .quantity-btn {
+  width: 80px;
+  height: 35px;
+  display: flex;
+}
+
+.select-modifier-group-btn:disabled {
+  border: none;
+}
+
+.modifier-group-container {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+@media only screen and (max-width: 768px) {
+  .menu-tab {
+    max-height: 20vh;
+  }
+}

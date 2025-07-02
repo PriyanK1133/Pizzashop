@@ -1,0 +1,54 @@
+@{
+    ViewBag.Title = "Page Not Found";
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css">
+    <style>
+        .custom-active-page-not-found-bg-color {
+            background: #d8eff8;
+        }
+ 
+        .custom-body-text-color {
+            color: #0066a7;
+        }
+ 
+        #custom-font-size {
+            font-size: 200px;
+            font-weight: 1000;
+        }
+    </style>
+</head>
+<body>
+    
+
+<div
+    class="container-fluid p-0 m-0  vw-100 vh-100 d-flex justify-content-center align-items-center custom-active-page-not-found-bg-color ">
+    <div class="d-flex flex-column justify-content-start align-items-center  ">
+        <div class="d-flex align-items-center justify-content-center gap-2 ">
+            <img src="~/images/logos/pizzashop_logo.png" alt="THis is logo img" width="10%" height="10%">
+            <div>
+                <h1 class="font-weight-bold custom-body-text-color ">PIZZASHOP</h1>
+            </div>
+        </div>
+        <div class="mb-5  d-flex flex-column justify-content-center align-items-center ">
+            <div class="custom-body-text-color  " id="custom-font-size">403</div>
+            <div class="h4">
+                Access Denied
+            </div>
+            <div class="custom-body-text-color p-3 h4 ">
+                Oops, You don't have access the page you are looking for.
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+ 
+</html>
+ 

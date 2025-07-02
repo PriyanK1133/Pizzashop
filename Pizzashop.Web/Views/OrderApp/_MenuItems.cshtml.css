@@ -1,0 +1,35 @@
+.menu-card {
+  background-color: green;
+  border-radius: 12px 0px 12px 12px;
+
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 250px;
+    height: 70px;
+    background-color: white;
+    border-radius: 10px 35px 10px 10px;
+
+    .menu-img {
+      width: 80px;
+      border-radius: 10px 0px 0px 10px;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .card-content {
+      width: 150px;
+
+      .favourite-icon {
+        cursor: pointer;
+        transition: all 0.4s ease;
+      }
+
+      .favourite-icon:hover {
+        scale: 1.2;
+      }
+    }
+  }
+}

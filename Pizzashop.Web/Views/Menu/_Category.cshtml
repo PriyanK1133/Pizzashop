@@ -1,0 +1,274 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.CategoryVM>;
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+@* Add Category Modal  *@
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="add-category-form" class="w-100">
+                <div class="modal-header">
+                    <h1 class="modal-title text-secondary fs-5" id="exampleModalLabel">
+                        <span>Add Category</span>
+                    </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="clearAddCategoryModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="categoryId">
+                    <div class="mb-2">
+                        <input type="text" name="name" id="categoryName" class="form-control " placeholder="Name*"
+                            maxlength="20">
+                    </div>
+                    <div class="mb-2">
+                        <textarea name="description" id="description" class="form-control mb-2"
+                            placeholder="Description"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <button type="submit" class="btn btn-primary bg-header rounded-0" disabled="@(!canEdit)">Save </button>
+                    <button type="button" class="btn rounded-0 border-dark me-3" data-bs-dismiss="modal" onclick="clearAddCategoryModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Delete Confirmation Modal  *@
+<div class="modal fade " id="delete-category-modal" tabindex="-1" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title text-secondary fs-5" id="exampleModalLabel">
+                    <span>Delete Confirmation</span>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="~/images/toppng.com-warning-icon-2400x2400.png" width="35px" alt="" class="mb-2">
+                <p>Are you sure you want to delete Category?</p>
+            </div>
+            <div class="text-center mb-3">
+                <a id="delete-category-btn" type="button" class="btn btn-primary bg-header me-2 rounded-0 px-3"
+                    data-bs-dismiss="modal">Yes</a>
+                <button type="button" class="btn text-primary bg-white text-header border-primary rounded-0 px-3"
+                    data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Category  *@
+<div class="row">
+    <!-- Category list   -->
+    <div class="col-12 col-md-auto pe-md-0">
+
+        <div class="shadow-sm p-2 border-end border-primary list category-list">
+            <div class="category-title d-flex align-items-center justify-content-between ">
+                <h4 class="text-header ">
+                    <span>Categories</span>
+                </h4>
+                <button type="button" role="button" class="add-category btn border-primary text-header fs-3 py-0"
+                    disabled="@(!canEdit)" data-bs-toggle="modal" data-bs-target="#addCategoryModal">+
+                </button>
+            </div>
+
+            <div  class="d-flex align-items-start">
+                <ul id="category-sortable"
+                    class="nav menu-tab flex-md-column align-items-start nav-pills overflow-y-auto d-flex flex-md-nowrap w-100">
+                @if(Model?.Any() ?? false){
+                    @foreach (var item in Model)
+                    {
+                        <li id="@item.Id"
+                            class="d-flex align-items-center justify-content-between w-100 mb-2 list-item item item-btn for-order" data-id="@item.Id">
+                            <div class="nav-link text-start  w-100 d-flex align-items-center pe-0 for-drag" type="button">
+                                <span class="icon d-flex six-dots-icon for-grab">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </span>
+                                @if (item.Name.Length > 15)
+                                {
+                                    <span class="ms-2 cat-name text-nowrap" data-bs-toggle="tooltip1" data-bs-placement="right"
+                                        data-bs-custom-class="custom-tooltip" data-bs-title="@item.Name">
+                                        @(item.Name.Substring(0, 15) + "...")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="ms-2 cat-name text-nowrap">@item.Name</span>
+                                }
+
+                            </div>
+                            <div class="d-flex align-items-center justify-content-end utility-btn">
+                                <button title="Edit"
+                                    onClick="setModalData(`@item.Id.ToString()`,`@item.Name.ToString()`,`@item.Description?.ToString()` )"
+                                    class="btn nav-link bg-transparent  active edit-btn"><i
+                                        class="fa-solid fa-pencil"></i></button>
+                                <button title="Delete" data-id="@item.Id" class="btn bg-transparent nav-link active delete-btn" disabled="@(!canDelete)"><i
+                                        class="fa-solid fa-trash-can" data-bs-toggle="modal"
+                                        data-bs-target="#delete-category-modal"></i></button>
+                            </div>
+                        </li>   
+                    }
+                }
+                else{
+                    <div>No Categories Found!</div>
+                }
+                </ul>
+            </div>
+        </div>
+    </div>  
+    
+      @* Items  *@
+    <div class="col ps-md-0">
+        <div class="bg-white p-2 h-100">
+            <div class="items-title">
+                <h4 class="text-header">
+                    <span>Items</span>
+                </h4>
+
+                <div class="d-flex gap-2 m-2 justify-content-end align-items-center ">
+                    <div>
+                        <div class="input-group">
+                            <input name="search " id="search" placeholder="Search" class="form-control border-end-0">
+                            <span class="input-group-text bg-white border-start-0">
+                                <img src="~/images/icons/search.svg" alt="" width="24px">
+                            </span>
+                        </div>
+                    </div>
+
+                    <button title="Delete All" id="delete-multiple-items" class="btn border" role="button" type="button" disabled="@(!canDelete)">
+                        <img src="~/images/icons/trash.svg" alt="">
+                    </button>
+                    <button id="add-item-btn" type="button" disabled="@(!canEdit)"
+                        class="btn btn-primary py-2 px-3 text-decoration-none rounded-2 bg-header text-white ms-1 text-nowrap">
+                        <span> + New Item</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="display-item-table" class="data-table"></div>        </div>
+        </div>
+    </div>
+
+<!-- Add New Item Menu Modal -->
+<div class="modal fade" id="addNewModal" tabindex="-1" aria-labelledby="exampleModalLabel">
+</div>
+
+<script>
+    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip1"]')
+    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+</script>
+
+<script>    
+    var dataTable = $("#display-item-table");
+    var addModal = $("#addNewModal");
+    var itemsToDelete = [];
+
+     $(".item").first().addClass("active");
+    $.ajax({
+      type: "GET",
+      url: "/Menu/GetPagedItems",
+      success: function (response) {
+        $("#display-item-table").html(response);
+      },
+    });
+
+    var categoryValidator = $("#add-category-form").validate({
+        rules: {
+            name: {
+                required: true,
+                maxlength: 20
+            },
+        },
+        messages: {
+            name: {
+                required: "Name is required!",
+                maxlength: "Category Name must be less than 20 character!"
+            },
+        },
+        highlight: function (element) {
+            $(element).parent().addClass('error')
+        },
+        unhighlight: function (element) {
+            $(element).parent().removeClass('error')
+        },
+    });
+
+    $(document).off("keyup","#add-category-form").on('keyup', '#add-category-form', function () { $(this).valid(); });
+
+    // Add/Edit Category  
+        $(document).off("submit", "#add-category-form").on("submit", "#add-category-form", function (e) {
+            e.preventDefault();
+            if (!$(this).valid()) {
+                return;
+            }
+
+            var formdata = {
+                name: $("#categoryName").val(),
+                description: $("#description").val(),
+            }
+
+            var id = $("#categoryId").val()
+            if (id.length != 0) {
+                formdata.id = id;
+                submitData("EditCategory", formdata)
+            }
+            else {
+                submitData("AddCategory", formdata)
+            }
+            $("#addCategoryModal").modal("hide");
+        })
+
+    //Delete Category 
+        $(document).off("click", "#delete-category-btn").on("click", "#delete-category-btn", function () {
+            var id = $(this).data("id");
+            submitData("DeleteCategory", { "id": id });
+        })
+
+    $(document).off("click", ".delete-btn").on("click", ".delete-btn", function () {
+        var id = $(this).data("id");
+        $("#delete-category-btn").data("id", id);
+    })
+
+    // Add Item 
+    $(document).off("click", "#add-item-btn").on("click", "#add-item-btn", function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: "GET",
+            url: `/Menu/GetItemById`,
+                data: { "id": "@Guid.Empty" },
+                success: function (data) {
+                addModal.html(data);
+                addModal.modal("show");
+                },
+            });
+        })
+
+
+    $(document).off("hidden.bs.modal", "#addCategoryModal").on('hidden.bs.modal', '#addCategoryModal', function () {
+        var modal = $(this);
+        modal.find("form")[0].reset();
+        categoryValidator.resetForm();
+        modal.find("#exampleModalLabel").text("Add Category");
+    })
+
+   // Add Event Listner to category buttons to load relevent table
+        $(document).off("click", ".item-btn").on("click", ".item-btn", function () {
+             $(".item-btn").removeClass("active");
+            $(this).addClass("active");
+
+            itemsToDelete = []
+            page = 1;
+            $("#search").val('');
+            loadPagedItems();
+
+        });
+
+        // sortable
+
+        makeSortable($("#category-sortable"), "/Menu/ChangeCategoriesOrder")
+    </script>

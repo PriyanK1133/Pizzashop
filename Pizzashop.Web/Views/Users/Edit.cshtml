@@ -1,0 +1,219 @@
+@model Pizzashop.Entity.ViewModel.UserVM;
+@{
+    ViewData["Title"] = "Update User";
+    bool hasImage = !string.IsNullOrEmpty(Model.ProfileImage);
+}
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+<!-- TITLE  -->
+<div class="title d-flex flex-wrap justify-content-between align-items-center mb-2">
+    <h1 class="text-header mb-2">Update User </h1>
+    <a asp-action="Index" class="btn d-flex align-items-center py-2 border-primary text-header gap-2"><span
+            class=" fw-bold">&lt; </span>Back</a>
+</div>
+
+<!-- Form  -->
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="container-fluid bg-light py-3 shadow-lg ">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id">
+    <input type="hidden" asp-for="Email">
+    <input id="current-image" type="hidden" asp-for="ProfileImage">
+    <div class="row">
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <input asp-for="FirstName" class="form-control" id="firstname" placeholder="First Name">
+                <label asp-for="FirstName">First Name*</label>
+            </div>
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <input asp-for="LastName" class="form-control" placeholder="Last Name">
+                <label asp-for="LastName">Last Name*</label>
+            </div>
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <input asp-for="UserName" class="form-control" placeholder="UserName">
+                <label asp-for="UserName">User Name*</label>
+            </div>
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <select asp-for="RoleId" class="form-select" asp-items="@ViewBag.Roles"
+                    aria-label="Floating label select example">
+                    <option selected>Select Role</option>
+                </select>
+                <label asp-for="Role">Role*</label>
+            </div>
+            <span asp-validation-for="RoleId" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <input asp-for="Email" class="form-control" placeholder="Email" disabled>
+                <label asp-for="Email">Email*</label>
+            </div>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <select asp-for="IsActive" role="button" class="form-select" id="floatingSelect"
+                    aria-label="Floating label select example">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+                <label asp-for="IsActive">Status*</label>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class=" col">
+            <div class="mb-2 ">
+                <label for="formFile" role="button" id="preview"
+                    class="form-label d-flex justify-content-center gap-2 align-items-center border-dashed @(hasImage?"p-1":"p-5") rounded-2 position-relative">
+                    <button class="btn btn-close position-absolute end-0 top-0 @(hasImage?"":"d-none")"
+                        type="button"></button>
+                    @if (hasImage)
+                    {
+                        <img src="@Url.Content("~/Uploads/"+Model.ProfileImage)" class="rounded-circle" height="150px"
+                            width="150px">
+                    }
+                    else
+                    {
+                        <img src="~/images/icons/upload-files.svg">
+                        <span>Drag And Drop Or Browse Files</span>
+                    }
+                </label>
+                <input class="form-control d-none" type="file" name="imageFile" id="formFile" accept=".jpg, .jpeg, .png">
+            </div>
+        </div>
+    </div>
+
+    <div class="row ">
+        <div class="col-md mb-3">
+            <div class="form-floating ">
+                <select asp-for="CountryId" id="country" asp-items="@ViewBag.Countries" role="button"
+                    class="form-select" id="floatingSelect">
+                    <option disabled>Please select one</option>
+                </select>
+                <label asp-for="CountryId">Country*</label>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md mb-3">
+            <div class="form-floating ">
+                <select asp-for="StateId" asp-items="@ViewBag.States" id="state" role="button" class="form-select">
+                    <option disabled>Please select one</option>
+                </select>
+                <label asp-for="StateId">State*</label>
+                <span asp-validation-for="StateId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md mb-3">
+            <div class="form-floating ">
+                <select asp-for="CityId" asp-items="@ViewBag.Cities" id="city" role="button" class="form-select"
+                    required>
+                    <option disabled>Please select one</option>
+                </select>
+                <label asp-for="CityId">City*</label>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <input type="text"  class="form-control" asp-for="Zipcode"
+                    placeholder="Zipcode">
+                <label asp-for="Zipcode">Zipcode</label>
+            </div>
+            <span asp-validation-for="Zipcode" class="text-danger"></span>
+        </div>
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <textarea asp-for="Address" class="form-control" placeholder="Email"></textarea>
+                <label asp-for="Address">Address</label>
+            </div>
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+        <div class="col-md mb-3">
+            <div class="form-floating">
+                <input type="text" asp-for="Phone" class="form-control" id="phone" placeholder="Phone">
+                <label asp-for="Phone">Phone*</label>
+            </div>
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col gap-3">
+            @if (canEdit)
+            {
+                <button type="submit" class="btn btn-primary rounded-0 bg-header text-white col-auto mb-2">
+                    Update User
+                </button>
+
+            }
+            <a asp-action="Edit" class="btn rounded-0 border-primary text-primary col-auto mb-2">Clear</a>
+        </div>
+
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $("#country").change(function () {
+                var id = $(this).val();
+                console.log(id);
+                var state = $("#state");
+                var city = $("#city");
+                var v = "<option disabled selected>Please select one</option>";
+
+                state.empty();
+                city.empty();
+                city.html(v);
+                city.attr("disabled", "disabled");
+
+                $.get("@Url.Action("StateBind", "Home")", { countryId: id }, function (data) {
+
+                    $.each(data, function (i, v1) {
+                        v += "<option value=" + v1.value + ">" + v1.text + "</option>";
+                    });
+                    state.html(v);
+                });
+            });
+
+            $("#state").change(function () {
+                var id = $(this).val();
+                var city = $("#city");
+
+                city.removeAttr("disabled", "disabled");
+                city.empty();
+
+                $.get("@Url.Action("CityBind", "Home")", { stateId: id }, function (data) {
+                    var v = "<option disabled selected>Please select one</option>";
+                    $.each(data, function (i, v1) {
+                        v += "<option value=" + v1.value + ">" + v1.text + "</option>";
+                    });
+                    city.html(v);
+                });
+            });
+        });
+    </script>
+}

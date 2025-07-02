@@ -1,0 +1,229 @@
+@model Pizzashop.Entity.ViewModel.TableAndSectionVM;
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+<div class="table-responsive table-scroll">
+    <table class="table table-hover">
+        <thead class=" text-center border-dark ">
+            <tr>
+                <th scope="col">
+                    <div class="form-check text-start">
+                        <input id="all-table-check" class=" me-2" type="checkbox" value="" id="flexCheckIndeterminate">
+                        <label class="form-check-label " for="flexCheckIndeterminate">
+                            Name
+                        </label>
+                    </div>
+                </th>
+                <th scope="col">Capacity</th>
+                <th scope="col">Status</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+
+        <tbody class="text-center">
+            @if (Model.TablePagination.PagedList.Any())
+            {
+                @foreach (var item in Model.TablePagination.PagedList)
+                {
+                    <tr class="align-content-center">
+                        <td class="text-start ">
+                            <div class="form-check d-flex align-items-center ">
+                                <input class="table-check  me-2" type="checkbox" data-id="@item.Id">
+                                <div class="form-check-label" for="flexCheckDefault">
+                                    @if (item.Name.Length > 15)
+                                    {
+                                        <span data-bs-toggle="tooltip" data-bs-placement="right"
+                                            data-bs-custom-class="custom-tooltip" data-bs-title="@item.Name">
+                                            @(item.Name.Substring(0, 15) + " ...")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.Name</span>
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @item.Capacity
+                        </td>
+                        <td>
+                            @if (item.IsOccupied)
+                            {
+                                <span class="px-2 py-1 bg-secondary rounded-pill text-white">Occupied</span>
+                            }
+                            else
+                            {
+                                <span class="px-2 py-1 bg-success rounded-pill text-white">Available</span>
+                            }
+                        </td>
+                        <td>
+                            @if (canEdit)
+                            {
+                                <a role="button" type="button" class="btn edit-table-btn" data-id="@item.Id"
+                                    onclick="GetEditTableData('@item.Id')">
+                                    <img src="~/images/icons/edit-pen.svg" alt="" width="20px">
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="disabled btn"><img src="~/images/icons/edit-pen.svg" alt="" width="20px"></button>
+                            }
+                            <button type="button" class="btn delete-table-btn" data-bs-toggle="modal" disabled="@(!canDelete)"
+                                data-bs-target="#delete-table-modal #delete-modal" data-id="@item.Id">
+                                <img src="~/images/icons/trash.svg" alt="" width="20px">
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">No Tables Found!</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<partial name="_Pagination" model="@Model.TablePagination.Pagination" />
+
+<!-- Add New Table Modal -->
+<div class="modal fade" id="add-new-table-modal">
+    <partial name="_AddEditTableModal"
+        model="new Pizzashop.Entity.ViewModel.TableVM() { SectionId = @Model.SectionId, SectionName = @Model.SectionName }" />
+</div>
+
+<div class="modal fade" id="edit-table-modal">
+    
+</div>
+
+@* Delete Table Confirmation Modal  *@
+@{
+    string deleteMessage = "Are you sure you want to delete Table?";
+}
+<div id="delete-table-modal">
+    <partial name="_DeleteConfirmationModal" model="deleteMessage" />
+</div>
+
+<script>    // Delete Table  
+    var DeleteConfirmationModal = $("#delete-table-modal").find(".modal");
+
+    $(".delete-table-btn").click(function () {
+        var id = $(this).data("id");
+        DeleteConfirmationModal.find("#delete-btn").attr("id", id);
+    });
+
+    DeleteConfirmationModal.find("#delete-btn").off("click").on("click", function () {
+        var id = $(this).attr("id");
+        $.ajax({
+            method: "DELETE",
+            url: "/TableAndSection/DeleteTable",
+            data: { id },
+            success: function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                }
+                else {
+                    toastr.error(response.message);
+                }
+                $(".section-btn.active").click();
+            }
+        })
+    })
+    // Pagination
+
+    $("#next-page-btn").off("click").on("click", function () {
+        page = @Model.TablePagination.Pagination.CurrentPage + 1;
+        loadPagedTables();
+    });
+
+    $("#prev-page-btn").off("click").on("click", function () {
+        page = @Model.TablePagination.Pagination.CurrentPage - 1;
+        loadPagedTables();
+    }); $("#pagesizelist").change(function () {
+        page = 1;
+        loadPagedTables();
+    })
+
+    function loadPagedTables() {
+        var sectionId = $(".section-btn.active").attr("id");
+        var searchString = $("#search").val();
+        var pageSize = $("#pagesizelist").val();
+
+        $.ajax({
+            type: "GET",
+            url: `/TableAndSection/GetPagedTables`,
+            data: { sectionId, searchString, page, pageSize },
+            success: function (data) {
+                dataTable.html(data);
+            }
+        });
+    }
+
+    // Mass Delete
+    $.each(tablesToDelete, function (i, val) {
+        $(`.table-check[data-id="${val}"]`).prop("checked", true);
+    })
+    var isAllChecked = $('.table-check:checked').length == $('.table-check').length;
+    $("#all-table-check").prop("checked", isAllChecked); $("#all-table-check").change(function () {
+        var isChecked = $(this).is(":checked");
+        $(".table-check").prop("checked", isChecked);
+        $(".table-check").change();
+    });
+
+    $(".table-check").change(function () {
+        var isChecked = $(this).is(":checked");
+        var id = $(this).data("id");
+
+        if (isChecked) {
+            if (tablesToDelete.indexOf(id) === -1) {
+                tablesToDelete.push(id);
+            }
+        }
+        else {
+            removeTable(tablesToDelete, id);
+        }
+
+        var isAllChecked = $('.table-check:checked').length == $('.table-check').length;
+        $("#all-table-check").prop("checked", isAllChecked);
+        console.log(tablesToDelete)
+    });    //Delete Multiple Items  
+    var multipleDeleteModal = $("#multiple-delete-modal");
+
+    $("#delete-multiple-items").click(function () {
+        if (itemsToDelete.length == 0) {
+            toastr.error("No Items Selected!");
+            return;
+        }
+        multipleDeleteModal.find("#delete-modal").modal("show");
+    });
+
+    multipleDeleteModal.find("#delete-btn").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/Menu/DeleteManyItem",
+            data: { ids: itemsToDelete },
+            success: function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    $(".item.active").click();
+                }
+                else {
+                    toastr.error(response.message);
+                }
+            }
+        })
+    })
+
+    // Remove Item From Array  
+    function removeTable(array, idToDelete) {
+        const index = array.indexOf(idToDelete);
+
+        if (index !== -1) {
+            array.splice(index, 1);
+        }
+    }</script>

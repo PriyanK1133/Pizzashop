@@ -1,0 +1,443 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.SectionVM>;
+
+@{
+    ViewData["Title"] = "Table And Section";
+}
+
+@{
+    string deleteSectionConfirmationMessage = "Are you sure you want to delete Section?";
+    string massDeleteTableMessage = "Are you sure you want to delete selected Tables?";
+}
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+
+
+<h1 class="text-header mb-3">Sections/Tables</h1>
+
+
+@* Add Section Modal  *@
+<div class="modal fade" id="add-section-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="add-section-form" method="post">
+                <div class="modal-header">
+                    <h1 class="modal-title text-secondary fs-5" id="add-edit-title">
+                        <span>Add Section</span>
+                    </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="sectionId" value="@Guid.Empty">
+                    <div class="mb-2">
+                        <input type="text" name="name" id="sectionName" class="form-control " placeholder="Name*"
+                            required maxlength="20">
+                    </div>
+                    <div class="mb-2">
+                        <textarea name="description" id="description" class="form-control mb-2"
+                            placeholder="Description"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <button id="add-edit-save-btn" type="submit" class="btn btn-primary bg-header rounded-0">Save
+                    </button>
+                    <button type="button" class="btn rounded-0 border-dark me-3" data-bs-dismiss="modal" onclick="clearSectionModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Delete Confirmation Modal  *@
+<div id="delete-section-modal">
+    <partial name="_DeleteConfirmationModal" model="deleteSectionConfirmationMessage" />
+</div>
+
+<div id="mass-delete-table-modal">
+    <partial name="_DeleteConfirmationModal" model="massDeleteTableMessage" />
+</div>
+
+
+@* Sections  *@
+<div class="row ">
+    <!-- Section list   -->
+    <div class="col-12 col-md-auto pe-md-0">
+
+        <div class="shadow-sm p-2 border-end border-primary list section-list">
+            <div class="section-title d-flex align-items-center justify-content-between ">
+                <h4 class="text-header ">
+                    <span>Sections</span>
+                </h4>
+                <button type="button" role="button" class="add-section btn border-primary text-header fs-3 py-0" disabled="@(!canEdit)"
+                    data-bs-toggle="modal" data-bs-target="#add-section-modal">+
+                </button>
+            </div>
+
+            <div class="d-flex align-items-start">
+                <ul id="sortable-sections"
+                    class="nav menu-tab flex-md-column align-items-start nav-pills overflow-y-auto d-flex flex-md-nowrap w-100">
+                    @if (Model?.Any() ?? false)
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <li id="@item.Id"
+                                class="d-flex align-items-center justify-content-between w-100  mb-2 list-item section-btn for-order " data-id="@item.Id">
+                                <div class="nav-link text-start  w-100 d-flex align-items-center pe-0 for-drag" type="button">
+                                    <span class="icon d-flex me-2 six-dots-icon for-grab">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </span>
+                                    @if (item.Name.Length > 15)
+                                    {
+                                        <span data-bs-toggle="tooltip1" data-bs-placement="right"
+                                            data-bs-custom-class="custom-tooltip" data-bs-title="@item.Name">
+                                            @(item.Name.Substring(0, 15) + "...")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.Name</span>
+                                    }
+
+                                </div>
+                                <div class="d-flex align-items-center justify-content-end utility-btn">
+                                    <button disabled="@(!canEdit)"
+                                        onClick="setSectionData(`@item.Id.ToString()`,`@item.Name.ToString()`,`@item.Description?.ToString()` )"
+                                        class="btn nav-link bg-transparent active edit-btn"><i
+                                            class="fa-solid fa-pencil"></i></button>
+                                    <button data-id="@item.Id" class="btn bg-transparent nav-link active delete-section-btn" disabled="@(!canDelete)"><i
+                                            class="fa-solid fa-trash-can"></i></button>
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <div>No Sections to Display!</div>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    @* Items  *@
+    <div class="col ps-md-0">
+        <div class="bg-white p-2 h-100">
+            <div>
+                <h4 class="text-header">
+                    Tables
+                </h4>
+
+                <div class="d-flex gap-2 m-2 justify-content-end align-items-center ">
+                    <div class="input-group w-50">
+                        <input type="text" name="search " id="search" placeholder="Search"
+                            class="form-control border-end-0">
+                        <span class="input-group-text bg-white border-start-0">
+                            <img src="~/images/icons/search.svg" alt="" width="24px">
+                        </span>
+                    </div>
+
+                    <button id="delete-multiple-tables" class="btn border" role="button" type="button" disabled="@(!canDelete)">
+                        <img src="~/images/icons/trash.svg" alt="">
+                    </button>
+
+                    <button id="add-table-btn" type="button" disabled="@(!canEdit)"
+                        class="btn btn-primary py-2 px-3 text-decoration-none rounded-2 bg-header text-white ms-1 text-nowrap">
+                        <span> + New Table</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="data-table-tables" class="data-table"></div>
+
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip1"]')
+        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+    </script>
+    <script>
+        var page = 1;
+        var tablesToDelete = [];
+        var dataTable = $("#data-table-tables");
+
+        // Function  
+        function setSectionData(id, name, description) {
+            var modal = $("#add-section-modal");
+            modal.find("#sectionId").val(id);
+            modal.find("#sectionName").val(name);
+            modal.find("#description").val(description);
+            modal.find("#add-edit-title").text("Update Section");
+            modal.modal("show");
+        }
+
+        function GetEditTableData(id) {
+            $.ajax({
+                type: "GET",
+                url: "/TableAndSection/GetTableById",
+                data: { id },
+                success: function (response) {
+                    var editModal = $("#edit-table-modal");
+                    editModal.html(response);
+                    editModal.modal("show");
+                    editModal.find("#add-edit-table-title").text("Update Table");
+                },
+                error: function () {
+                    toastr.error("Something get wrong!");
+                }
+            })
+        }
+
+        function submitData(action, formdata) {
+                $.ajax({
+                    type: "POST",
+                    url: `/TableAndSection/${action}`,
+                    data: formdata,
+                    success: function (data) {
+                        console.log(data);
+                        if (data.success) {
+                            toastr.success(data.message);
+                            $("#category").load('@Url.Action("GetSections", "TableAndSection")');
+
+                        } else {
+                            toastr.error(data.message)
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Section not added!!');
+                    }
+                })
+            }
+
+            function loadData(action, element, id) {
+                $.ajax({
+                    type: "GET",
+                    url: `/TableAndSection/${action}`,
+                    data: { "sectionId": id },
+                    success: function (data) {
+                        element.html(data);
+                    }
+                });
+            }
+
+            function clearSectionModal(){
+                let form = $("#add-section-form");
+                form[0].reset();
+                sectionValidator.reset();
+            }
+
+        $(document).ready(function () {
+
+
+            // Select Section Active Class  
+            var sectionBtn = $(".section-btn");
+            sectionBtn.first().addClass("active");
+            sectionBtn.click(function () {
+                sectionBtn.removeClass("active");
+                $(this).addClass("active");
+            });
+
+            // Load Data On first time page load  
+            loadData("GetPagedTables", dataTable);
+
+            //Add Event Listner to Section buttons to load relevent table
+            sectionBtn.click(function () {
+                var id = $(this).attr("id");
+                loadData("GetPagedTables", dataTable, id);
+            });
+
+            var sectionValidator = $("#add-section-form").validate({
+                rules: {
+                    name: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    name: {
+                        required: "Name is required!",
+                    },
+                },
+                highlight: function (element) {
+                    $(element).parent().addClass('error')
+                },
+                unhighlight: function (element) {
+                    $(element).parent().removeClass('error')
+                },
+            });
+
+            $('#add-section-form').one('keyup', function () { $(this).valid(); });
+
+            // Add/Edit Section  
+            $("#add-edit-save-btn").click(function (e) {
+                e.preventDefault();
+
+                var form = $("#add-section-form");
+                if (!form.valid()) {
+                    form.find("input#sectionName").focus();
+                    return;
+                }
+
+                var id = $("#sectionId").val()
+                if (id != "@Guid.Empty") {
+                    form.attr("action", "@Url.Action("EditSection", "TableAndSection")")
+                }
+                else {
+                    form.attr("action", "@Url.Action("AddSection", "TableAndSection")")
+                }
+
+                form.submit();
+            })
+
+
+            // Delete Section  
+            var DeleteConfirmationModal = $("#delete-section-modal");
+
+            $(".delete-section-btn").click(function () {
+                var id = $(this).data("id");
+                DeleteConfirmationModal.find("#delete-btn").attr("href", '@Url.Action("DeleteSection", "TableAndSection", new { id = "__id__" })'.replace('__id__', id));
+                DeleteConfirmationModal.find("#delete-btn").removeAttr("data-bs-dismiss");
+                DeleteConfirmationModal.find(".modal").modal("show");
+            })
+
+            //  Add Table
+            $("#add-table-btn").on('click', function (e) {
+                e.preventDefault();
+                var addTableModal = $("#data-table-tables").find("#add-new-table-modal");
+                addTableModal.modal("show");
+
+                var addTableSubmitBtn = addTableModal.find("#submit-btn");
+
+                addTableSubmitBtn.off("click").on("click", function (e) {
+                    var form = $("#add-new-table-modal").find("form");
+                    var data = form.serialize();
+                    console.log(data);
+                    console.log(form)
+                    $.ajax({
+                        type: "POST",
+                        url: "/TableAndSection/AddTable",
+                        dataType: "JSON",
+                        data: data,
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                            }
+                            else {
+                                toastr.error(response.message);
+                            }
+                            addTableModal.modal("hide");
+                            $(".section-btn.active").click();
+                        },
+                        error: function (response) {
+                            addTableModal.html(response.responseText);
+                        }
+                    })
+                })
+            })
+
+
+            $('#add-section-modal').on('hidden.bs.modal', function () {
+                var modal = $(this);
+                modal.find("form")[0].reset();
+                sectionValidator.resetForm();
+                $(this).find("input").removeAttr("aria-invalid");
+                $("#sectionId").val('@Guid.Empty');
+                modal.find("#add-edit-title").text("Add Section");
+            })
+
+
+            $(document).on("click", "#edit-table-modal #submit-btn", function () {
+                var editModal = $("#edit-table-modal");
+                var data = editModal.find("form").serialize();
+                $.ajax({
+                    method: "POST",
+                    url: "/TableAndSection/EditTable",
+                    data: data,
+                    dataType: "JSON",
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $(".section-btn.active").click();
+                        }
+                        else {
+                            toastr.error(response.message);
+                        }
+                        editModal.modal("hide");
+                    },
+                    error: function (response) {
+                        editModal.html(response.responseText);
+                    }
+                })
+            });
+
+
+
+            // Mass Delete Table 
+
+            var multipleDeleteModal = $("#mass-delete-table-modal");
+
+            $("#delete-multiple-tables").click(function () {
+                if (tablesToDelete.length == 0) {
+                    toastr.error("No Items Selected!");
+                    return;
+                }
+                multipleDeleteModal.find("#delete-modal").modal("show");
+            });
+
+            multipleDeleteModal.find("#delete-btn").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/TableAndSection/DeleteManyTables",
+                    data: { ids: tablesToDelete },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $(".section-btn.active").click();
+                        }
+                        else {
+                            toastr.error(response.message);
+                        }
+                    }
+                })
+            })
+
+
+
+            // Hepler Functions of AJAX  
+            
+
+            var searchchange = debounce(function () {
+                loadPagedTables()
+            }, 200);
+
+            $("#search").keyup(searchchange);
+
+
+            // Add Event Listner to category buttons to load relevent table  
+            $(".section-btn").click(function () {
+                tablesToDelete = []
+                page = 1;
+                $("#search").val('');
+                loadPagedTables();
+
+            });
+        })
+
+        // Sortable
+
+        makeSortable($("#sortable-sections"),"/TableAndSection/ChangeSectionOrder");
+
+    </script>
+}

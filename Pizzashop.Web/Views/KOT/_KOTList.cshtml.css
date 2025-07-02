@@ -1,0 +1,13 @@
+.card{
+    width: 400px;
+    min-width: 280px;
+}
+
+.card-body{
+    height: 200px;
+    overflow-y: auto;
+}
+
+.card-footer{
+    min-height: 60px;
+}

@@ -1,0 +1,174 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.ModifierGroupVM>;
+
+@{
+    PermissionVM? permission = SessionUtils.GetPermission(Context);
+    bool canEdit = permission?.CanEdit ?? false;
+    bool canDelete = permission?.CanDelete ?? false;
+}
+@* Select Existing Modifier Patrial Modal  *@
+<div class="modal fade " id="existing-modifiers-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 text-secondary" id="exampleModalLabel">Select Existing Modifier</h1>
+                <button type="button" class="btn-close" data-bs-toggle="modal" aria-label="Close"
+                    data-bs-target="#addGroupModal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="search " id="all-modifier-search" placeholder="Search"
+                            class="form-control border-end-0 col-6">
+                        <span class="input-group-text bg-white border-start-0">
+                            <img src="~/images/icons/search.svg" alt="" width="24px">
+                        </span>
+                    </div>
+                </div>
+
+                <div id="existing-modifiers-partial" class="w-100">
+
+                </div>
+
+            </div>
+            <div class="modal-footer text-start">
+                <button id="add-selected-modifier-btn" type="button" class="btn btn-primary bg-header rounded-0">Add
+                </button>
+                <button type="button" class="btn rounded-0 border-dark me-3" data-bs-toggle="modal"
+                    data-bs-target="#addGroupModal">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@* Delete Confirmation Modal  *@
+<div class="modal fade " id="delete-group-modal" tabindex="-1" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title text-secondary fs-5" id="exampleModalLabel">
+                    <span>Delete Confirmation</span>
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="~/images/toppng.com-warning-icon-2400x2400.png" width="35px" alt="" class="mb-2">
+                <p>Are you sure you want to delete Modifier Group?</p>
+            </div>
+            <div class="text-center mb-3">
+                <a id="delete-group-btn" type="button" class="btn btn-primary bg-header me-2 rounded-0 px-3"
+                    data-bs-dismiss="modal">Yes</a>
+                <button type="button" class="btn text-primary bg-white text-header border-primary rounded-0 px-3"
+                    data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row ">
+    <!-- Modifier Group   -->
+    <div class="col-12 col-md-auto pe-md-0 ">
+
+        <div class="p-2 border-end border-primary list modifier-group-list">
+            <div class="group-title d-flex align-items-center justify-content-between ">
+                <h4 class="text-header ">
+                    <span>Modifier Groups</span>
+                </h4>
+                <button title="Delete All" type="button" role="button" class="add-group btn border-primary text-header fs-3 py-0"
+                    disabled="@(!canEdit)" data-bs-toggle="modal" data-bs-target="#addGroupModal"
+                    onclick="clearGroupModalData()">+
+                </button>
+            </div>
+
+            <div class="d-flex align-items-start">
+                <ul id="modifier-groups-sortable"
+                    class="nav menu-tab flex-md-column align-items-start nav-pills overflow-y-auto d-flex flex-md-nowrap modifier-group w-100">
+                    @if (Model?.Any() ?? false)
+                    {
+                        @foreach (var modifierGroup in Model)
+                        {
+                            <li id="@modifierGroup.Id"
+                                class="d-flex align-items-center justify-content-between w-100 mb-2 list-item modifier modifier-btn for-order "
+                                data-id="@modifierGroup.Id">
+                                <div class="nav-link text-start  w-100 d-flex align-items-center for-drag" type="button">
+                                    <span class="icon d-flex six-dots-icon for-grab">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </span>
+                                    @if (modifierGroup.Name.Length > 15)
+                                    {
+                                        <span class="ms-2 cat-name text-nowrap" data-bs-toggle="tooltip-group"
+                                            data-bs-placement="right" data-bs-custom-class="custom-tooltip"
+                                            data-bs-title="@modifierGroup.Name">
+                                            @(modifierGroup.Name.Substring(0, 15) + "...")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="ms-2 cat-name text-nowrap">@modifierGroup.Name</span>
+                                    }
+                                </div>
+                                <div class="d-flex align-items-center justify-content-end utility-btn">
+                                    <button title="Edit"
+                                        onClick="setGroupModalData(`@modifierGroup.Id.ToString()`,`@modifierGroup.Name.ToString()`,`@modifierGroup.Description?.ToString()` )"
+                                        class="btn nav-link bg-transparent  active edit-btn"><i
+                                            class="fa-solid fa-pencil"></i></button>
+                                    <button title="Delete" disabled="@(!canDelete)" data-id="@modifierGroup.Id"
+                                        class="btn bg-transparent nav-link active delete-modifier-group-btn"><i class="fa-solid fa-trash-can"
+                                            data-bs-toggle="modal" data-bs-target="#delete-group-modal"></i></button>
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <div>No Modifier Groups To Display!</div>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div> @* Modifiers  *@
+    <div class="col ps-md-0">
+        <div class="bg-white p-2 h-100">
+            <div class="modifiers-title">
+                <h4 class="text-header">
+                    <span>Modifiers</span>
+                </h4>
+
+                <div class="d-flex gap-2 m-2 justify-content-end align-items-center ">
+                    <div>
+                        <div class="input-group">
+                            <input type="text" name="search " id="modifier-search" placeholder="Search"
+                                class="form-control border-end-0">
+                            <span class="input-group-text bg-white border-start-0">
+                                <img src="~/images/icons/search.svg" alt="" width="24px">
+                            </span>
+                        </div>
+                    </div>
+
+                    <button title="Delete All"  id="delete-multiple-modifiers" class="btn border" role="button" type="button"
+                        disabled="@(!canDelete)">
+                        <img src="~/images/icons/trash.svg" alt="">
+                    </button>
+
+                    <button id="add-modifier-btn" type="button" disabled="@(!canEdit)"
+                        class="btn btn-primary py-2 px-3 text-decoration-none rounded-2 bg-header text-white ms-1 text-nowrap">
+                        <span> + New Modifier</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="data-table-modifier" class="data-table"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Add New Modifier Menu Modal -->
+<div class="modal fade" id="add-modifier-modal" tabindex="-1" aria-labelledby="exampleModalLabel">
+
+</div>
+<script>
+    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip-group"]')
+    var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>

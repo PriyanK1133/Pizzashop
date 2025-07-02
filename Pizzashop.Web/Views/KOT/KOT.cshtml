@@ -1,0 +1,81 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.CategoryVM>;
+
+@{
+    Layout = "_OrderApp";
+    ViewData["Title"] = "KOT | OrderApp";
+}
+
+<div class="modal fade" id="kot-order-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Order ID: #<span id="order-id"></span></h5>
+                <button class="btn btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="text-secondary d-flex justify-content-between border-secondary border-bottom fw-bold p-2">
+                    <span>Item</span>
+                    <span>Quantity</span>
+                </div>
+                <div id='kot-order-items'>
+
+                </div>
+            </div>
+            <div class="modal-footer mb-3">
+                <button id="submit-btn" type="button" class="btn btn-primary bg-header me-2 rounded-0 px-3">Mark As
+                    Prepared</button>
+                <button type="button" class="btn text-primary bg-white text-header border-primary rounded-0 px-3"
+                    data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<h3 class="text-header fw-bold mb-2">KOT</h3>
+
+<div>
+    <ul class="nav bg-white nav-pills mb-2 overflow-x-auto flex-nowrap shadow-lg" id="pills-tab" role="tablist">
+        <li class="nav-item">
+            <button id="all" class="nav-link category-tab active" type="button" data-bs-toggle="tab" data-name="All"
+                role="tab">
+                All</button>
+        </li>
+        @foreach (var item in Model)
+        {
+            <li class="nav-item">
+                <button id="@item.Id" class="nav-link category-tab text-nowrap" type="button"
+                    data-bs-toggle="tab" data-name="@item.Name" role="tab">
+                    @item.Name
+                </button>
+            </li>
+        }
+    </ul>
+
+    <div class="bg-white p-3 shadow-lg">
+        <div class="d-flex mb-3">
+
+            <h4 id="tab-header" class="text-header"> All </h4>
+
+            <div class="col d-flex justify-content-end">
+                <button class="btn btn-outline-primary text-header active-btn btn-sm me-1 item-status"
+                    data-status="InProgress">In Progress</button>
+                <button class="btn btn-outline-primary text-header btn-sm me-2 item-status "
+                    data-status="Ready">Ready</button>
+                <button class="btn btn-outline-primary btn-sm me-1 arrow-border" type="button"
+                    data-bs-target="#kot-carousel" data-bs-slide="prev">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="btn btn-outline-primary btn-sm arrow-border" type="button" data-bs-target="#kot-carousel"
+                    data-bs-slide="next">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        <div id="kot-list-partial">
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/kot.js"></script>
+}

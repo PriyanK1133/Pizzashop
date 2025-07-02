@@ -1,0 +1,58 @@
+.orderapp-options.active {
+  background-color: var(--bs-info);
+}
+
+.modifier-card-body {
+  width: 150px;
+  background-color: white;
+  border-top-right-radius: 30px;
+}
+
+#category-sidebar {
+  min-height: calc(100vh - 74px);
+}
+
+#category-offcanvas {
+  width: 250px;
+  min-width: fit-content;
+}
+
+.category-tab.active {
+  background-color: var(--primary-color);
+  width: 100%;
+  color: white;
+  border-radius: 0% 30px 30px 0%;
+  transition: all 0.3s ease;
+}
+
+.indicator {
+  height: 12px;
+  width: 12px;
+}
+
+.star {
+  cursor: pointer;
+}
+
+.star.active {
+  color: gold;
+}
+
+hr {
+  background-color: orange;
+  color: orange;
+  height: 3px;
+}
+
+.cartBtnDiv {
+  position: fixed;
+  bottom: 40px;
+  right: 10px;
+  z-index: 10;
+  background-color: #006cac;
+  color: white;
+}
+
+.order-item {
+  font-size: small;
+}

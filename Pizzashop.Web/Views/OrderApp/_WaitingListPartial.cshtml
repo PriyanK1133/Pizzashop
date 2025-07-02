@@ -1,0 +1,52 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.CustomerDetailsVM>;
+
+<div class="table-responsive shadow-lg p-3 bg-white">
+    <table class="table">
+        <thead class="text-nowrap">
+            <tr>
+                <th scope="col">#Token No</th>
+                <th scope="col">Created At</th>
+                <th scope="col">Waiting Time</th>
+                <th scope="col">Name</th>
+                <th scope="col">No. Of Persons</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Email</th>
+                <th scope="col" class="text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody class="text-nowrap">
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="8" class="text-center">
+                        No Waiting Token Available!
+                    </td>
+                </tr>
+                return;
+            }
+
+            @foreach (var cv in Model)
+            {
+                <tr>
+                    <td>#@cv.Id.ToString().ToUpper()[^5..]</td>
+                    <td>@cv.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</td>
+                    <td><span class="live-time" data-time='@cv.CreatedAt.ToString("o")' data-sec="false"></span></td>
+                    <td>@cv.Name</td>
+                    <td>@cv.NumberOfPerson</td>
+                    <td>@cv.Phone</td>
+                    <td>@cv.Email</td>
+                    <td class="text-center" data-id="@cv.Id" data-section-id="@cv.SectionId">
+                        <button type="button" class="btn edit-waiting-token-btn"
+                            onclick='setEditWaitingTokenData(@Html.Raw(Json.Serialize(cv)))'><i
+                                class="bi bi-pen fs-6"></i></button> |
+                        <button type="button" class="btn remove-waiting-token-btn"><i
+                                class="bi bi-trash3 fs-6"></i></button> |
+                        <button type="button" class="btn assign-tables-btn" data-persons="@cv.NumberOfPerson"
+                            data-bs-toggle="modal" data-bs-target="#assign-tables-modal"><i
+                                class="bi bi-person-add fs-6"></i></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

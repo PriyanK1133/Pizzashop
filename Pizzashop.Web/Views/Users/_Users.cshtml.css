@@ -1,0 +1,13 @@
+.active{
+    background-color: var(--bs-success);
+    border-radius: 1rem;
+    color: white;
+    padding: 0.2rem 1.2rem;
+}
+
+.inactive{
+    background-color: var(--bs-danger);
+    border-radius: 1rem;
+    color: white;
+    padding: 0.2rem 1.2rem;
+}

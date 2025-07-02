@@ -1,0 +1,83 @@
+@model Pizzashop.Entity.ViewModel.TableVM;
+
+@{
+    bool IsAdd = Model.Id.Equals(Guid.Empty);
+}
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <form id="add-table-form" method="post">
+            <div class="modal-header">
+                <h1 class="modal-title text-secondary fs-5" id="add-edit-table-title">
+                    @if (IsAdd)
+                    {
+                        <span>Add Table</span>
+                    }
+                    else
+                    {
+                        <span>Update Table</span>
+                    }
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetForm()"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" asp-for="Id">
+                <div class="row gap-3">
+                    <div class="col-md mb-2">
+                        <div class="form-floating">
+                            <input asp-for="Name" class="form-control" placeholder="Name*">
+                            <label asp-for="Name">Name*</label>
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="col-md mb-2">
+                        <input type="hidden" asp-for="SectionId">
+                        <input type="hidden" asp-for="SectionName">
+                        <div class="form-floating">
+                            <select disabled role="button" class="form-select" asp-for="SectionId" id="dd-sections">
+                                <option selected value="@Model.SectionId">@Model.SectionName</option>
+                            </select>
+                            <label asp-for="SectionId"></label>
+                        </div>
+                        <span asp-validation-for="SectionId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row gap-3">
+                    <div class="col-md mb-2">
+                        <div class="form-floating">
+                            <input asp-for="Capacity" class="form-control" placeholder="Capacity*">
+                            <label asp-for="Capacity">Capacity*</label>
+                        </div>
+                        <span asp-validation-for="Capacity" class="text-danger"></span>
+
+                    </div>
+                    <div class="col-md mb-2">
+                        <div class="form-floating">
+                            <select disabled asp-for="IsOccupied" role="button" class="form-select" id="floatingSelect"
+                                aria-label="Floating label select example">
+                                <option value=true>Occupied</option>
+                                <option value=false>Available</option>
+                            </select>
+                            <label asp-for="IsOccupied"></label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer ">
+                <button id="submit-btn" type="button" class="btn btn-primary bg-header rounded-0">Save
+                </button>
+                <button type="button" onclick="resetForm()" class="btn rounded-0 border-dark me-3"
+                    data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>@{
+await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+
+<script>
+    function resetForm() {
+        $("#add-table-form").find(".text-danger").text("").removeClass("input-validation-error");
+        $("#add-table-form")[0].reset();
+    }
+</script>

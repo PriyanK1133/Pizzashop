@@ -1,0 +1,74 @@
+@model IEnumerable<Pizzashop.Entity.ViewModel.OrderTableVM>;
+
+@if (!(Model?.Any() ?? false))
+{
+    <div class="text-center">No Tables Here !</div>
+    return;
+}
+
+<style>
+    .table-box {
+        width: 250px;
+        cursor: pointer;
+    }
+
+    .selected-table {
+        border: 2px solid var(--bs-success) !important;
+    }
+</style>
+
+@{
+    string tableAssignedClass = " bg-success border-success-subtle assigned-table";
+    string tableAvailableClass = "bg-secondary border-secondary-subtle available-table";
+    string tableRunningClass = "bg-primary border-primary-subtle running-table";
+}
+
+<div class="d-flex flex-column flex-sm-row gap-2 flex-wrap align-items-stretch">
+    @foreach (var table in Model)
+    {
+        string statusClass = "";
+        switch (table.Status)
+        {
+            case Constants.OrderTableRunning:
+                statusClass = tableRunningClass;
+                break;
+            case Constants.OrderTableAssigned:
+                statusClass = tableAssignedClass;
+                break;
+            default:
+                statusClass = tableAvailableClass;
+                break;
+        }
+
+        <div class="table-box p-3 mb-2 border rounded-1 bg-opacity-10 @statusClass " data-id="@table.Id" data-order-id="@table.OrderId"
+            data-capacity="@table.Capacity">
+            <div class="d-flex justify-content-between mb-1"><span>@table.Name</span>
+                @if (table.Status == Constants.OrderTableRunning)
+                {
+                    <small>Rs. @table.OrderTotal</small>
+                }
+            </div>
+            <div class="d-flex justify-content-center align-items-center ">
+                <div class="col-6 ">
+                    <div><i class="bi bi-people"></i></div>
+                    <small>@table.Capacity</small>
+                </div>
+                <div class="col-6 ">
+                    <div class="text-center">
+                        <i class="bi bi-stopwatch"></i>
+                    </div>
+                    <div class="text-center">
+                        @if (table.OrderTime != null)
+                        {
+                            <small class="text-secondary live-time" data-time="@table.OrderTime?.ToString("o")"></small>
+                        }
+                        else
+                        {
+                            <small class="text-secondary ">0 <br />Min</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
