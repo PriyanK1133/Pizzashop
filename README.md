@@ -48,43 +48,85 @@ This project supports multiple user roles: **Super Admin**, **Account Manager**,
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshots (Click to Expand)
 
-### 🏠 Dashboard  
-![Dashboard](./assets/screenshots/1.png)
+<details>
+  <summary>🏠 Dashboard</summary>
 
-### 👤 Profile  
-![Profile](./assets/screenshots/3.png)
+  ![Dashboard](./assets/screenshots/1.png)  
+  *Main dashboard showing key metrics and navigation tiles.*
 
-### 👥 Users Management  
-![Users](./assets/screenshots/2.png)
+</details>
 
-### 🍕 Menu Management  
-![Menu](./assets/screenshots/5.png)
+<details>
+  <summary>👤 Profile & 👥 User Management</summary>
 
-### 🧑‍🍳 Modifier Groups  
-![Modifiers](./assets/screenshots/6.png)  
-![Modifiers](./assets/screenshots/16.png)  
-![Modifiers](./assets/screenshots/17.png)  
-![Modifiers](./assets/screenshots/18.png)
+  ![Profile](./assets/screenshots/3.png)  
+  *User profile with basic details and role information.*
 
-### 🍽️ Table & Section Management  
-![Tables](./assets/screenshots/7.png)
+  ![Users](./assets/screenshots/2.png)  
+  *Super admin view to manage user roles and permissions.*
 
-### 💰 Taxes & Fees  
-![Taxes](./assets/screenshots/8.png)
+</details>
 
-### 🧾 Orders  
-![Order](./assets/screenshots/4.png)
+<details>
+  <summary>🍕 Menu & 🧑‍🍳 Modifier Groups</summary>
 
-### 📲 Order App Flow (KOT)  
-![Order Table](./assets/screenshots/9.png)  
-![Order Table](./assets/screenshots/10.png)  
-![Waiting Token](./assets/screenshots/12.png)  
-![Order Menu](./assets/screenshots/14.png)  
-![Order Menu](./assets/screenshots/15.png)  
-![KOT](./assets/screenshots/13.png)
+  ![Menu](./assets/screenshots/5.png)  
+  *List and manage menu items with categories and prices.*
 
+  ![Modifiers](./assets/screenshots/6.png)  
+  *Create modifier groups like toppings, sizes, etc.*
+
+  ![Modifiers](./assets/screenshots/16.png)  
+  ![Modifiers](./assets/screenshots/17.png)  
+  ![Modifiers](./assets/screenshots/18.png)  
+  *Preview of multiple modifiers in different states.*
+
+</details>
+
+<details>
+  <summary>🍽️ Table & Section Management</summary>
+
+  ![Tables](./assets/screenshots/7.png)  
+  *Organize tables by section and assign statuses (Available, Occupied).*
+
+</details>
+
+<details>
+  <summary>💰 Tax & Fees Management</summary>
+
+  ![Taxes](./assets/screenshots/8.png)  
+  *Configure tax types and default fee structures for items.*
+
+</details>
+
+<details>
+  <summary>🧾 Order Screen</summary>
+
+  ![Order](./assets/screenshots/4.png)  
+  *Order summary screen showing item details and customer selection.*
+
+</details>
+
+<details>
+  <summary>📲 KOT Flow & Order App</summary>
+
+  ![Order Table](./assets/screenshots/9.png)  
+  ![Order Table](./assets/screenshots/10.png)  
+  *View and assign tables to customers.*
+
+  ![Waiting Token](./assets/screenshots/12.png)  
+  *Display waiting queue with token numbers.*
+
+  ![Order Menu](./assets/screenshots/14.png)  
+  ![Order Menu](./assets/screenshots/15.png)  
+  *Menu selection with modifiers inside order screen.*
+
+  ![KOT](./assets/screenshots/13.png)  
+  *Kitchen Order Ticket view by chefs.*
+
+</details>
 
 
 
