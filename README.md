@@ -50,9 +50,7 @@ This project supports multiple user roles: **Super Admin**, **Account Manager**,
 
 ## 📸 Screenshots
 
-> Ensure screenshots are stored in `assets/screenshots/`
-
-### 🏠 Super Admin Dashboard  
+### 🏠 Dashboard  
 ![Dashboard](./assets/screenshots/1.png)
 
 ### 🍽️ Table & Section Management  
