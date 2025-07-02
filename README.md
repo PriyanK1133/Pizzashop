@@ -52,36 +52,38 @@ This project supports multiple user roles: **Super Admin**, **Account Manager**,
 
 ### 🏠 Dashboard  
 ![Dashboard](./assets/screenshots/1.png)
-### Profile  
+
+### 👤 Profile  
 ![Profile](./assets/screenshots/3.png)
-### Users  
+
+### 👥 Users Management  
 ![Users](./assets/screenshots/2.png)
 
 ### 🍕 Menu Management  
 ![Menu](./assets/screenshots/5.png)
+
 ### 🧑‍🍳 Modifier Groups  
-![Modifiers](./assets/screenshots/6.png)
-![Modifiers](./assets/screenshots/16.png)
-![Modifiers](./assets/screenshots/17.png)
+![Modifiers](./assets/screenshots/6.png)  
+![Modifiers](./assets/screenshots/16.png)  
+![Modifiers](./assets/screenshots/17.png)  
 ![Modifiers](./assets/screenshots/18.png)
 
 ### 🍽️ Table & Section Management  
 ![Tables](./assets/screenshots/7.png)
 
-### Taxes % Fees  
-![Tables](./assets/screenshots/8.png)
+### 💰 Taxes & Fees  
+![Taxes](./assets/screenshots/8.png)
 
-### 🧾 Order 
+### 🧾 Orders  
 ![Order](./assets/screenshots/4.png)
 
-### 🧾 Order App Flow (KOT)  
-![Order Table](./assets/screenshots/9.png)
-![Order Table](./assets/screenshots/10.png)
-![Waiting Token](./assets/screenshots/12.png)
-![Order Menu](./assets/screenshots/14.png)
-![Order Menu](./assets/screenshots/15.png)
+### 📲 Order App Flow (KOT)  
+![Order Table](./assets/screenshots/9.png)  
+![Order Table](./assets/screenshots/10.png)  
+![Waiting Token](./assets/screenshots/12.png)  
+![Order Menu](./assets/screenshots/14.png)  
+![Order Menu](./assets/screenshots/15.png)  
 ![KOT](./assets/screenshots/13.png)
-
 
 
 
